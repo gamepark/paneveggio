@@ -1,3 +1,4 @@
+import { Action } from '@gamepark/paneveggio/material/Action'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import PlayerBoardEn from './boards/player-en.webp'
 import PlayerBoardFr from './boards/player-fr.webp'
@@ -24,6 +25,15 @@ const byNumber = (files: Record<string, string>): Record<number, string> =>
 
 export const characterImagesEn = byNumber(import.meta.glob<string>('./cards/characters/en/*.webp', { eager: true, import: 'default' }))
 export const characterImagesFr = byNumber(import.meta.glob<string>('./cards/characters/fr/*.webp', { eager: true, import: 'default' }))
+
+/** Starting card -> image, from the file name (`<deck>.webp`), deck named after its action. */
+const byDeck = (files: Record<string, string>): Record<Action, string> => {
+  const names: Record<string, Action> = { wood: Action.Wood, study: Action.Study, crafting: Action.Crafting, relation: Action.Relation, restoration: Action.Restoration }
+  return Object.fromEntries(Object.entries(files).map(([path, url]) => [names[/\/(\w+)\.webp$/.exec(path)![1]], url])) as Record<Action, string>
+}
+
+export const startingImagesEn = byDeck(import.meta.glob<string>('./cards/starters/en/*.webp', { eager: true, import: 'default' }))
+export const startingImagesFr = byDeck(import.meta.glob<string>('./cards/starters/fr/*.webp', { eager: true, import: 'default' }))
 
 export const violinImages: Record<PlayerColor, string> = {
   [PlayerColor.Blue]: ViolinBlue,

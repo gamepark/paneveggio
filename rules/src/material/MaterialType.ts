@@ -5,6 +5,8 @@ export enum MaterialType {
   PlayerBoard,
   /** The 75 Character cards, musicians and apprentices. Id = the number printed on the card, 1 to 75. */
   CharacterCard,
+  /** The 5 starting cards (RULES p. 6), used by the setup "Players choose". Id = the Action of the deck. */
+  StartingCard,
   /** The first player card. */
   FirstPlayerCard,
   /** The 7 black Note tokens of each player, on their sheet music. */

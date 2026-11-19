@@ -3,5 +3,17 @@
   "identities.1": "Bleu",
   "identities.2": "Rouge",
   "identities.3": "Vert",
-  "identities.4": "Orange"
+  "identities.4": "Orange",
+  "option.setup": "Mise en place",
+  "option.setup.1": "Decks de démarrage",
+  "option.setup.1.help": "Chaque joueur reçoit un deck de démarrage tout prêt : partition, musicien Partenaire, Contacts et main. Recommandé pour une première partie.",
+  "option.setup.2": "Mulligan",
+  "option.setup.2.help": "Chaque joueur reçoit 10 cartes, peut une fois en remettre sous la pioche et en piocher autant, puis en garde 7. Il choisit ensuite un musicien de départ, ses Contacts et sa partition.",
+  "option.setup.3": "Draft",
+  "option.setup.3.help": "Chaque joueur reçoit 8 cartes, en garde une et passe le reste au joueur suivant, jusqu'à en avoir gardé 7. Il choisit ensuite un musicien de départ, ses Contacts et sa partition.",
+  "option.decks": "Attribution des decks de démarrage",
+  "option.decks.1": "Au hasard",
+  "option.decks.1.help": "Chaque joueur reçoit un deck de démarrage tiré au hasard.",
+  "option.decks.2": "Choix des joueurs",
+  "option.decks.2.help": "À tour de rôle, dans le sens antihoraire en commençant par le dernier joueur, chacun choisit un des decks de démarrage restants. Le premier joueur choisit en dernier."
 }

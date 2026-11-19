@@ -9,6 +9,10 @@ export enum LocationType {
   HelpArea,
   /** The face-down central draw pile. */
   Deck,
+  /** Setup "Players choose": the starting cards left to choose from. */
+  StartingCards,
+  /** Setup Mulligan or Draft: the 5 starting musicians, put aside until each player has chosen one (RULES p. 5). */
+  StartingMusicians,
 
   // ------------------------------------------------------------------ player area (player = owner)
 
@@ -18,6 +22,8 @@ export enum LocationType {
   FirstPlayer,
   /** The hand of a player, hidden from the others. */
   PlayerHand,
+  /** Draft: the packet a player chooses a card from, hidden from the others. */
+  DraftPacket,
   /**
    * Contacts area, above the board: 4 piles, id = the pile, 1 to 4 from left to right.
    * x = depth in the pile: 0 is the top card, the only one the other players can see (decision D8).
@@ -31,6 +37,11 @@ export enum LocationType {
   PartnerApprentices,
   /** Tokens next to the board, not used yet (Violin and Lutherie tokens). */
   Reserve,
+  /**
+   * Lutherie tokens given back by another player (wear, Heritage, musician taken back), waiting to become ducats or
+   * studies. Decision D2: their owner spreads them at the start of their own turn.
+   */
+  ReturnedTokens,
   /** Note tokens on the sheet music: id = the action of the line, x = the beat, 0 to 6 from left to right. */
   SheetMusic,
   /** Ducats area of the board (Lutherie tokens). */
@@ -47,5 +58,7 @@ export enum LocationType {
   /** A violin crafted on a musician card. parent = the card, id = the slot, 0 for the top one. */
   MusicianSlot,
   /** A Lutherie token on a Violin token (wood or violin): its quality. parent = the Violin token, x = 0 for the lowest. */
-  OnViolin
+  OnViolin,
+  /** Rameau n°23: a Lutherie token on a Note token, whose action is worth 3 beats (RULES p. 20). parent = the note. */
+  OnNote
 }

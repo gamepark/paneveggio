@@ -1,7 +1,5 @@
 import { RuleId } from '@gamepark/paneveggio/rules/RuleId'
 import { ComponentType } from 'react'
-import { TheFirstStepHeader } from './TheFirstStepHeader'
 
-export const Headers: Partial<Record<RuleId, ComponentType>> = {
-  [RuleId.TheFirstStep]: TheFirstStepHeader
-}
+/** The headers of each rule: step 7 of the adaptation. */
+export const Headers: Partial<Record<RuleId, ComponentType>> = {}

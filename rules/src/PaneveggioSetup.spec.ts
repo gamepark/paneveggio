@@ -25,7 +25,7 @@ describe('Setup with the starting decks', () => {
       const deck = deckOf(rules, player)
       musicians.add(deck.musician)
       const cards = rules.material(MaterialType.CharacterCard)
-      const contacts = cards.location(LocationType.Contacts).player(player).getItems()
+      const contacts = cards.location(LocationType.Contacts).player(player).sort((card) => card.location.id).getItems()
       expect(contacts.map((card) => [card.location.id, card.location.x, card.id])).toEqual(deck.contacts.map((id, pile) => [pile + 1, 0, id]))
       expect(cards.location(LocationType.PlayerHand).player(player).getItems().map((card) => card.id).sort()).toEqual([...deck.hand].sort())
       const notes = rules.material(MaterialType.NoteToken).location(LocationType.SheetMusic).player(player).getItems()
@@ -37,9 +37,9 @@ describe('Setup with the starting decks', () => {
   it('gives each player 12 Violin tokens in reserve, 1 Lutherie token in Ducats and the 13 others in reserve', () => {
     const rules = setup(4)
     for (const player of rules.players) {
-      expect(rules.material(MaterialType.ViolinToken).id(player).location(LocationType.Reserve).player(player).getQuantity()).toBe(VIOLIN_TOKENS)
-      expect(rules.material(MaterialType.LutherieToken).id(player).location(LocationType.Ducats).player(player).getQuantity()).toBe(1)
-      expect(rules.material(MaterialType.LutherieToken).id(player).location(LocationType.Reserve).player(player).getQuantity()).toBe(LUTHERIE_TOKENS - 1)
+      expect(rules.material(MaterialType.ViolinToken).id(player).location(LocationType.Reserve).player(player).length).toBe(VIOLIN_TOKENS)
+      expect(rules.material(MaterialType.LutherieToken).id(player).location(LocationType.Ducats).player(player).length).toBe(1)
+      expect(rules.material(MaterialType.LutherieToken).id(player).location(LocationType.Reserve).player(player).length).toBe(LUTHERIE_TOKENS - 1)
     }
   })
 

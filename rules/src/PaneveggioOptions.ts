@@ -1,6 +1,24 @@
 import { getEnumValues, OptionsSpecV2 } from '@gamepark/rules-api'
 import { PlayerColor } from './PlayerColor'
 
+/** The setup (RULES p. 5 and 6, decision D1 on BGA). */
+export enum SetupMode {
+  /** First game: each player gets a starting deck, with a ready sheet music (RULES p. 6). */
+  StartingDecks = 1,
+  /** 10 cards, return some under the draw pile once and draw as many, keep 7 (RULES p. 5). */
+  Mulligan,
+  /** 8 cards, keep 1 and pass the rest to the next player, until 7 cards (RULES p. 5). */
+  Draft
+}
+
+/** [H19] how the starting decks are given, with the setup "Starting decks". */
+export enum DeckDistribution {
+  /** A different deck drawn at random for each player. */
+  Random = 1,
+  /** Each player chooses in turn, counterclockwise from the last player: the first player chooses last. */
+  PlayersChoose
+}
+
 /**
  * This is the options for each player in the game.
  */
@@ -8,10 +26,11 @@ type PlayerOptions = { id: PlayerColor }
 
 /**
  * This is the type of object that the game receives when a new game is started.
- * The first generic parameter, "{}", can be changed to include game options like variants or expansions.
  */
 export type PaneveggioOptions = {
   players: PlayerOptions[]
+  setup?: SetupMode
+  decks?: DeckDistribution
 }
 
 /**
@@ -34,5 +53,13 @@ export type PaneveggioOptions = {
 export const PaneveggioOptionsSpecV2: OptionsSpecV2 = {
   specVersion: 2,
   players: { min: 2, max: 4 },
-  identities: { values: getEnumValues(PlayerColor) }
+  identities: { values: getEnumValues(PlayerColor) },
+  options: {
+    setup: { kind: 'enum', values: getEnumValues(SetupMode) },
+    decks: {
+      kind: 'enum',
+      values: getEnumValues(DeckDistribution),
+      requires: [{ option: 'setup', values: [SetupMode.StartingDecks] }]
+    }
+  }
 }

@@ -13,6 +13,8 @@ import {
   Note,
   PlayerBoardEn,
   PlayerBoardFr,
+  startingImagesEn,
+  startingImagesFr,
   violinImages
 } from '../images/Images'
 import { boardHeight, boardWidth, cardHeight, cardRadius, cardWidth, getDisplayedPlayer, masterHeight, masterWidth, tokenImageSize } from '../locators/TableLayout'
@@ -33,6 +35,18 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
 
 class FrenchCharacterCardDescription extends CharacterCardDescription {
   images = characterImagesFr
+}
+
+/** A starting card (RULES p. 6), for the setup "Players choose". */
+class StartingCardDescription extends CardDescription<PlayerColor, MaterialType, LocationType> {
+  width = cardWidth
+  height = cardHeight
+  borderRadius = cardRadius
+  images = startingImagesEn
+}
+
+class FrenchStartingCardDescription extends StartingCardDescription {
+  images = startingImagesFr
 }
 
 class FirstPlayerCardDescription extends CardDescription<PlayerColor, MaterialType, LocationType> {
@@ -96,6 +110,7 @@ export const Material: Partial<Record<MaterialType, MaterialDescription>> = {
   [MaterialType.MasterBoard]: new MasterBoardDescription(),
   [MaterialType.PlayerBoard]: new PlayerBoardDescription(),
   [MaterialType.CharacterCard]: new CharacterCardDescription(),
+  [MaterialType.StartingCard]: new StartingCardDescription(),
   [MaterialType.FirstPlayerCard]: new FirstPlayerCardDescription(),
   [MaterialType.NoteToken]: new NoteTokenDescription(),
   [MaterialType.ViolinToken]: new ViolinTokenDescription(),
@@ -105,6 +120,7 @@ export const Material: Partial<Record<MaterialType, MaterialDescription>> = {
 export const materialI18n: Record<string, Partial<Record<MaterialType, MaterialDescription>>> = {
   fr: {
     [MaterialType.PlayerBoard]: new FrenchPlayerBoardDescription(),
-    [MaterialType.CharacterCard]: new FrenchCharacterCardDescription()
+    [MaterialType.CharacterCard]: new FrenchCharacterCardDescription(),
+    [MaterialType.StartingCard]: new FrenchStartingCardDescription()
   }
 }

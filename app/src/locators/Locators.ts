@@ -1,10 +1,12 @@
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
-import { DeckLocator, ItemContext, Locator, PileLocator } from '@gamepark/react-game'
+import { countSlots } from '@gamepark/paneveggio/material/CharacterCard'
+import { DeckLocator, ItemContext, ListLocator, Locator, PileLocator } from '@gamepark/react-game'
 import { Location, MaterialItem } from '@gamepark/rules-api'
 import {
   ContactsLocator,
+  DraftPacketLocator,
   ducatsLocator,
   FirstPlayerLocator,
   HeritageLocator,
@@ -13,13 +15,14 @@ import {
   PlayerBoardLocator,
   PlayerHandLocator,
   ReserveLocator,
+  ReturnedTokensLocator,
   SheetMusicLocator,
   studiesLocator,
   TurnDiscardLocator,
   WoodStockLocator
 } from './PlayerAreaLocators'
 import { cardHoverTransform } from './CardHover'
-import { deckCenter, masterBoardCenter } from './TableLayout'
+import { cardPitch, deckCenter, masterBoardCenter, masterHeight } from './TableLayout'
 
 /**
  * The 4 musicians of the Master Luthier board, on its illustration, each one above its column of the green band
@@ -39,6 +42,25 @@ class MasterMusicianLocator extends Locator<PlayerColor, MaterialType, LocationT
   }
 }
 
+/**
+ * A violin on a musician card, on the circle of its slot: the slots are on the right edge of the card, the last one
+ * centred at 88.65 % of its height, then every 17.56 % upwards (BGA measures, Game.slotTop).
+ */
+class MusicianSlotLocator extends Locator<PlayerColor, MaterialType, LocationType> {
+  parentItemType = MaterialType.CharacterCard
+
+  getPositionOnParent(location: Location<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    const total = countSlots(context.rules.material(MaterialType.CharacterCard).getItem<number>(location.parent!).id)
+    return { x: 84.6, y: 88.65 - (total - 1 - (location.id as number)) * 17.56 }
+  }
+}
+
+/** Rameau n°23: the token on its note, a little above it. */
+class OnNoteLocator extends Locator<PlayerColor, MaterialType, LocationType> {
+  parentItemType = MaterialType.NoteToken
+  coordinates = { y: -0.4, z: 0.1 }
+}
+
 /** A Lutherie token on a Violin token: each one a little higher, so that the pile shows its height. */
 class OnViolinLocator extends Locator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.ViolinToken
@@ -54,19 +76,25 @@ export const Locators: Partial<Record<LocationType, Locator<PlayerColor, Materia
   [LocationType.MasterMusician]: new MasterMusicianLocator(),
   [LocationType.HelpArea]: new PileLocator({ parentItemType: MaterialType.MasterBoard, positionOnParent: { x: 25, y: 87 }, radius: { x: 3, y: 0.8 } }),
   [LocationType.Deck]: new DeckLocator({ coordinates: deckCenter }),
+  // Setup only: the starting cards and the starting musicians, in a row on the Master Luthier board.
+  [LocationType.StartingCards]: new ListLocator({ coordinates: { x: masterBoardCenter.x - 2 * cardPitch, y: masterBoardCenter.y - masterHeight / 2 + 4.5 }, gap: { x: cardPitch } }),
+  [LocationType.StartingMusicians]: new ListLocator({ coordinates: { x: masterBoardCenter.x - 2 * cardPitch, y: masterBoardCenter.y - masterHeight / 2 + 4.5 }, gap: { x: cardPitch } }),
   [LocationType.PlayerBoard]: new PlayerBoardLocator(),
   [LocationType.FirstPlayer]: new FirstPlayerLocator(),
   [LocationType.PlayerHand]: new PlayerHandLocator(),
+  [LocationType.DraftPacket]: new DraftPacketLocator(),
   [LocationType.Contacts]: new ContactsLocator(),
   [LocationType.TurnDiscard]: new TurnDiscardLocator(),
   [LocationType.PartnerMusicians]: new PartnerMusiciansLocator(),
   [LocationType.PartnerApprentices]: new PartnerApprenticesLocator(),
   [LocationType.Reserve]: new ReserveLocator(),
+  [LocationType.ReturnedTokens]: new ReturnedTokensLocator(),
   [LocationType.SheetMusic]: new SheetMusicLocator(),
   [LocationType.Ducats]: ducatsLocator,
   [LocationType.Studies]: studiesLocator,
   [LocationType.WoodStock]: new WoodStockLocator(),
   [LocationType.Heritage]: new HeritageLocator(),
-  // MusicianSlot (violins on the cards) comes with the rules: the position of a slot depends on the slots printed on the card.
-  [LocationType.OnViolin]: new OnViolinLocator()
+  [LocationType.MusicianSlot]: new MusicianSlotLocator(),
+  [LocationType.OnViolin]: new OnViolinLocator(),
+  [LocationType.OnNote]: new OnNoteLocator()
 }

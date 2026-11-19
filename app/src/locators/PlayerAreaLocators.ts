@@ -134,6 +134,25 @@ export class PlayerHandLocator extends ListLocator<PlayerColor, MaterialType, Lo
   }
 }
 
+/** Draft: the packet to choose from, in a row where the Contacts will be (they are laid out after the draft). */
+export class DraftPacketLocator extends ListLocator<PlayerColor, MaterialType, LocationType> {
+  parentItemType = MaterialType.PlayerBoard
+  getParentItem = playerBoard
+  coordinates = { x: handX, y: contactsY }
+
+  getGap(location: Loc, context: Context) {
+    return isOwner(location, context) ? { x: cardPitch * 0.75 } : { x: 0.05, y: -0.05 }
+  }
+}
+
+/** The tokens given back by another player, waiting to become ducats or studies (D2): under the frame of the resources. */
+export class ReturnedTokensLocator extends PileLocator<PlayerColor, MaterialType, LocationType> {
+  parentItemType = MaterialType.PlayerBoard
+  getParentItem = playerBoard
+  positionOnParent = { x: 45, y: 67 }
+  radius = { x: 2, y: 0.3 }
+}
+
 /** The tokens not used yet, on the left of the hand: the Violin tokens above, the Lutherie tokens under them. */
 export class ReserveLocator extends PileLocator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.PlayerBoard
