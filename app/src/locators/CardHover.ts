@@ -8,8 +8,8 @@ import { boardCenter, boardHeight, boardWidth, cardHeight, cardWidth, getSeat, m
 type Item = MaterialItem<PlayerColor, LocationType>
 type ItemCtx = ItemContext<PlayerColor, MaterialType, LocationType>
 
-/** A card under the pointer is seen up close: twice the size of a real card, whatever its size on the table (as in Quadri Kids). */
-const hoverScale = 2
+/** A card under the pointer is seen up close: 4 times the size of a real card, whatever its size on the table, so that its texts can be read when the whole table is shown (Ludo, 19/11/2026). */
+const hoverScale = 4
 
 /** Where the card is on the table, and at which scale it is shown there (the cards of the other players are smaller). */
 const cardOnTable = (item: Item, context: ItemCtx) => {
