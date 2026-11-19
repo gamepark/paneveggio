@@ -8,6 +8,7 @@ import { Move, TaskRule } from './TaskRule'
  * Rameau n°23 (RULES p. 20): "Le joueur place 1 jeton Lutherie sur un jeton Note. À la prochaine séquence Atelier, cette
  * action vaudra 3 temps." The card says "Placez 1 jeton Étude sur 1 note": the token comes from the Studies area.
  * The token sits on the note (parent): "Si le jeton Note est déplacé, le jeton Lutherie le suit."
+ * The next turn it goes back to the reserve, after its action in a Workshop, at once in a Conservation (Ludo, 19/11/2026).
  */
 export class RameauRule extends TaskRule {
   getChoices(): Move[] {

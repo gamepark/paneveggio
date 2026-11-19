@@ -66,9 +66,11 @@ export class SheetMusicRule extends NoteMovesRule {
   }
 
   /**
-   * Conservation sequence (RULES p. 15): the token of Rameau n°23 comes back as a study (RULES p. 20), all the violins
-   * of the player on musicians go to their Heritage, the Lutherie tokens on them go back to their owners; then the
-   * player trains apprentices and places musicians, or takes partners back into hand (RULES p. 16 and 17).
+   * Conservation sequence (RULES p. 15): the token of Rameau n°23 goes back to the reserve, all the violins of the player
+   * on musicians go to their Heritage, the Lutherie tokens on them go back to their owners; then the player trains
+   * apprentices and places musicians, or takes partners back into hand (RULES p. 16 and 17).
+   * Rameau: RULES p. 20 says "le joueur reprend le jeton en tant qu'étude", but Ludo decided on 19/11/2026 that the
+   * token goes back to the reserve the next turn, whatever the sequence: do not make it a study again.
    */
   conservation(): Move[] {
     const player = this.player
@@ -76,7 +78,7 @@ export class SheetMusicRule extends NoteMovesRule {
     const rameau = this.material(MaterialType.LutherieToken)
       .location(LocationType.OnNote)
       .filter((item) => this.material(MaterialType.NoteToken).getItem(item.location.parent!).location.player === player)
-    if (rameau.length) moves.push(rameau.moveItem({ type: LocationType.Studies, player }))
+    if (rameau.length) moves.push(rameau.moveItem({ type: LocationType.Reserve, player }))
     const cards = new Set(
       this.table.violins
         .id(player)
