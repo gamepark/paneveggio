@@ -2,7 +2,12 @@ import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { BoardDescription, CardDescription, ItemContext, MaterialContext, MaterialDescription, SoundKit, TokenDescription } from '@gamepark/react-game'
-import { MaterialItem, MaterialMoveBuilder } from '@gamepark/rules-api'
+import { CustomMoveType, NoteMove, Resource } from '@gamepark/paneveggio/material/CustomMoveType'
+import { isCustomMoveType, MaterialItem, MaterialMove, MaterialMoveBuilder } from '@gamepark/rules-api'
+import { createElement } from 'react'
+import { helpAreaPosition } from '../locators/TableLayout'
+import { HelpMenu } from './HelpMenu'
+import { NoteMenu } from './NoteMenu'
 import {
   CardBack,
   characterImagesEn,
@@ -84,6 +89,17 @@ class MasterBoardDescription extends BoardDescription<PlayerColor, MaterialType,
   height = masterHeight
   image = MasterBoard
   staticItem = { location: { type: LocationType.MasterBoard } }
+
+  isMenuAlwaysVisible() {
+    return true
+  }
+
+  /** The help of the Master Luthier is asked on its help area (bottom left of the board, see Locators). */
+  getItemMenu(_item: MaterialItem<PlayerColor, LocationType>, _context: ItemContext<PlayerColor, MaterialType, LocationType>, legalMoves: MaterialMove[]) {
+    const moves = legalMoves.filter(isCustomMoveType<CustomMoveType, Resource>(CustomMoveType.AskForHelp))
+    if (!moves.length) return undefined
+    return createElement(HelpMenu, { moves, x: masterWidth * (helpAreaPosition.x / 100 - 0.5), y: masterHeight * (helpAreaPosition.y / 100 - 0.5) })
+  }
 }
 
 /** The tokens are wooden discs drawn with their shadow (app/src/images/README.md). */
@@ -96,6 +112,14 @@ abstract class WoodenTokenDescription<Id = PlayerColor> extends TokenDescription
 
 class NoteTokenDescription extends WoodenTokenDescription<undefined> {
   image = Note
+
+  /** A click on a note of the player shows its moves (up, down, swap), when the sheet music can change. */
+  getItemMenu(item: MaterialItem<PlayerColor, LocationType>, _context: ItemContext<PlayerColor, MaterialType, LocationType>, legalMoves: MaterialMove[]) {
+    const moves = legalMoves
+      .filter(isCustomMoveType<CustomMoveType, NoteMove>(CustomMoveType.MoveNote))
+      .filter((move) => move.data?.beat === item.location.x && item.location.type === LocationType.SheetMusic)
+    return moves.length ? createElement(NoteMenu, { moves }) : undefined
+  }
 }
 
 class ViolinTokenDescription extends WoodenTokenDescription {
