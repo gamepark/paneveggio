@@ -54,8 +54,9 @@ export const leftColumnX = -boardWidth / 2 - gap - cardWidth / 2
  * right edge of the board, "Musiciens Partenaires" on the top half, "Apprentis Partenaires" on the bottom half.
  */
 export const partnersX = boardWidth / 2 + gap + cardWidth / 2
-export const musiciansY = -boardHeight / 4
-export const apprenticesY = boardHeight / 4
+/** Measured on the board: the centres of the two printed labels (Ludo: "encore descendre", 19/11/2026). */
+export const musiciansY = -4.2
+export const apprenticesY = 5.9
 
 /** The hand under the board, the reserve of tokens on its left. */
 export const handX = -boardWidth / 2 + cardWidth / 2
