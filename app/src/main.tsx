@@ -7,7 +7,7 @@ import { createRoot } from 'react-dom/client'
 import { gameAnimations } from './animations/GameAnimations'
 import { App } from './App'
 import { Locators } from './locators/Locators'
-import { Material } from './material/Material'
+import { Material, materialI18n } from './material/Material'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -17,6 +17,7 @@ createRoot(document.getElementById('root')!).render(
       optionsSpec={PaneveggioOptionsSpecV2}
       GameSetup={PaneveggioSetup}
       material={Material}
+      materialI18n={materialI18n}
       locators={Locators}
       animations={gameAnimations}
     >

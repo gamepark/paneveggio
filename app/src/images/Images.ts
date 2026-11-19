@@ -1,0 +1,40 @@
+import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
+import PlayerBoardEn from './boards/player-en.webp'
+import PlayerBoardFr from './boards/player-fr.webp'
+import MasterBoard from './boards/master.webp'
+import CardBack from './cards/back.webp'
+import FirstPlayerCard from './cards/first-player.webp'
+import Ducat from './icons/ducat.webp'
+import Study from './icons/study.webp'
+import LutherieBlue from './tokens/lutherie-blue.webp'
+import LutherieGreen from './tokens/lutherie-green.webp'
+import LutherieOrange from './tokens/lutherie-orange.webp'
+import LutherieRed from './tokens/lutherie-red.webp'
+import Note from './tokens/note.webp'
+import ViolinBlue from './tokens/violin-blue.webp'
+import ViolinGreen from './tokens/violin-green.webp'
+import ViolinOrange from './tokens/violin-orange.webp'
+import ViolinRed from './tokens/violin-red.webp'
+
+export { CardBack, Ducat, FirstPlayerCard, MasterBoard, Note, PlayerBoardEn, PlayerBoardFr, Study }
+
+/** Card number -> image, from the file name (`<nn>.webp`). */
+const byNumber = (files: Record<string, string>): Record<number, string> =>
+  Object.fromEntries(Object.entries(files).map(([path, url]) => [Number(/\/(\d+)\.webp$/.exec(path)![1]), url]))
+
+export const characterImagesEn = byNumber(import.meta.glob<string>('./cards/characters/en/*.webp', { eager: true, import: 'default' }))
+export const characterImagesFr = byNumber(import.meta.glob<string>('./cards/characters/fr/*.webp', { eager: true, import: 'default' }))
+
+export const violinImages: Record<PlayerColor, string> = {
+  [PlayerColor.Blue]: ViolinBlue,
+  [PlayerColor.Red]: ViolinRed,
+  [PlayerColor.Green]: ViolinGreen,
+  [PlayerColor.Orange]: ViolinOrange
+}
+
+export const lutherieImages: Record<PlayerColor, string> = {
+  [PlayerColor.Blue]: LutherieBlue,
+  [PlayerColor.Red]: LutherieRed,
+  [PlayerColor.Green]: LutherieGreen,
+  [PlayerColor.Orange]: LutherieOrange
+}
