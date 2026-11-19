@@ -6,6 +6,6 @@ export const bandHeight = masterHeight * 0.256
 /** In the band, in cm from its centre: the help tokens pile, and the ducat and study icons of the help. */
 export const helpTokensX = -9.3 * masterScale
 export const helpDucatX = -3.2 * masterScale
-export const helpStudyX = 0 * masterScale
+export const helpStudyX = 0
 /** The green band of the costs, from 64.1 % to 74.4 % of the height: its centre from the centre of a card (at 32 %). */
 export const costY = masterHeight * (0.6925 - 0.32)
