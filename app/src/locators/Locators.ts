@@ -18,6 +18,7 @@ import {
   TurnDiscardLocator,
   WoodStockLocator
 } from './PlayerAreaLocators'
+import { cardHoverTransform } from './CardHover'
 import { deckCenter, masterBoardCenter } from './TableLayout'
 
 /**
@@ -31,6 +32,10 @@ class MasterMusicianLocator extends Locator<PlayerColor, MaterialType, LocationT
 
   getPositionOnParent(location: Location<PlayerColor, LocationType>) {
     return { x: masterSlotX[location.id], y: 32 }
+  }
+
+  getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    return cardHoverTransform(item, context)
   }
 }
 

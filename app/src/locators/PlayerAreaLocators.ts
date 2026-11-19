@@ -21,6 +21,7 @@ import {
   partnersX,
   seatScale
 } from './TableLayout'
+import { cardHoverTransform } from './CardHover'
 
 type Context = MaterialContext<PlayerColor, MaterialType, LocationType>
 type ItemCtx = ItemContext<PlayerColor, MaterialType, LocationType>
@@ -55,6 +56,10 @@ export class FirstPlayerLocator extends Locator<PlayerColor, MaterialType, Locat
   parentItemType = MaterialType.PlayerBoard
   getParentItem = playerBoard
   coordinates = { x: leftColumnX, y: contactsY }
+
+  getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
+    return cardHoverTransform(item, context)
+  }
 }
 
 /** The 4 piles of Contacts. Their owner sees them in steps (the banner of each card under the top one), the others a pile. */
@@ -72,6 +77,10 @@ export class ContactsLocator extends Locator<PlayerColor, MaterialType, Location
     const step = isViewer(item.location, context) ? contactStep : 0.05
     return { x, y: y - depth * step, z: (10 - depth) * 0.05 }
   }
+
+  getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
+    return cardHoverTransform(item, context)
+  }
 }
 
 export class TurnDiscardLocator extends ListLocator<PlayerColor, MaterialType, LocationType> {
@@ -79,6 +88,10 @@ export class TurnDiscardLocator extends ListLocator<PlayerColor, MaterialType, L
   getParentItem = playerBoard
   coordinates = { x: leftColumnX, y: musiciansY }
   gap = { y: 1.5 }
+
+  getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
+    return cardHoverTransform(item, context)
+  }
 }
 
 export class PartnerMusiciansLocator extends ListLocator<PlayerColor, MaterialType, LocationType> {
@@ -86,6 +99,10 @@ export class PartnerMusiciansLocator extends ListLocator<PlayerColor, MaterialTy
   getParentItem = playerBoard
   coordinates = { x: partnersX, y: musiciansY }
   gap = { x: cardPitch }
+
+  getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
+    return cardHoverTransform(item, context)
+  }
 }
 
 export class PartnerApprenticesLocator extends ListLocator<PlayerColor, MaterialType, LocationType> {
@@ -93,6 +110,10 @@ export class PartnerApprenticesLocator extends ListLocator<PlayerColor, Material
   getParentItem = playerBoard
   coordinates = { x: partnersX, y: apprenticesY }
   gap = { x: cardPitch }
+
+  getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
+    return cardHoverTransform(item, context)
+  }
 }
 
 /** The viewer's hand is spread under the board. The hands of the others are face-down piles. */
@@ -104,6 +125,10 @@ export class PlayerHandLocator extends ListLocator<PlayerColor, MaterialType, Lo
   getGap(location: Loc, context: Context) {
     if (!isViewer(location, context)) return { x: 0.05, y: -0.05 }
     return { x: handGap(this.countListItems(location, context)) }
+  }
+
+  getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
+    return cardHoverTransform(item, context)
   }
 }
 
