@@ -19,7 +19,13 @@ export const cardHeight = 8.7
 export const cardRadius = 0.3
 export const boardWidth = 29
 export const boardHeight = 21
-export const masterWidth = 25
+/**
+ * The Master Luthier board is drawn larger than the real one (25 cm), so that its 4 musicians, 21.45 % of its width
+ * apart, do not overlap: 28.5 cm leaves the usual 0.4 cm between two cards (Ludo: "il faudrait les espacer", 19/11/2026).
+ */
+export const masterWidth = 28.5
+/** Positions measured in cm on the 25 cm board are multiplied by this. */
+export const masterScale = masterWidth / 25
 export const masterHeight = (masterWidth * 1407) / 2500
 /** Tokens are 1.3 cm discs (the cut-outs of the sheet music and the slots of the cards). */
 export const tokenDiameter = 1.3

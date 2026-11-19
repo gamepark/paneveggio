@@ -3,7 +3,7 @@ import { Location } from '@gamepark/rules-api'
 import { useTranslation } from 'react-i18next'
 import { Ducat, Study } from '../images/Images'
 import { costY, helpDucatX, helpStudyX } from './MasterBoardLayout'
-import { masterWidth } from './TableLayout'
+import { masterScale, masterWidth } from './TableLayout'
 
 /** "n [study] ●…●": n studies more to craft a violin on the musician of Prestige n (RULES p. 6). */
 export const Cost = ({ location }: { location: Location }) => {
@@ -27,8 +27,8 @@ export const Band = () => {
   return (
     <>
       <span css={[text, { left: '1%', top: '6%' }]}>{t('master.help-area')}</span>
-      <span css={[token, { left: at(helpDucatX - 2.6) }]}>L</span>
-      <span css={[text, centered, { left: at(helpDucatX - 1.4) }]}>➜</span>
+      <span css={[token, { left: at(helpDucatX - 2.6 * masterScale) }]}>L</span>
+      <span css={[text, centered, { left: at(helpDucatX - 1.4 * masterScale) }]}>➜</span>
       <img src={Ducat} alt="" css={[icon, { left: at(helpDucatX) }]} />
       <span css={[text, centered, { left: at((helpDucatX + helpStudyX) / 2) }]}>/</span>
       <img src={Study} alt="" css={[icon, { left: at(helpStudyX) }]} />
