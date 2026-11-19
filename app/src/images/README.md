@@ -53,3 +53,18 @@ Token colours (`<color>`): `green` (#1d6b38 / #5fcf8e), `orange` (#b5581c / #f3c
 `blue` (#17717a / #86d4ec).
 
 The app shows the French images in French and the English images in every other language.
+
+## Cover, box and icon (`app/public`)
+
+Made by `scripts/prepare-public-images.mjs` from the publisher's `misc` folder:
+
+```
+node scripts/prepare-public-images.mjs <publisher folder>/misc
+```
+
+- `cover-1920.jpg` / `.webp`: the box front `meta/box-faces/pv_front.jpg` (866 × 622) at full height in the
+  middle; the sides are the same image stretched, blurred and darkened.
+- `box-640.png` / `.webp`: the 3D view of the real box `meta/box-1120.png` (BGA render, transparent), with the
+  light cardboard shadow (dilation 2 px, σ 7 px, opacity 0.36, `#1A1107`).
+- `avatar-*.png`, `favicon-96x96.png`, `favicon.svg`, `favicon.ico`: the violin of the card back, square crop
+  440 × 440 at (80, 455) of `sources/elements/cartes-paneveggio_82.png` (same framing as the BGA icon).
