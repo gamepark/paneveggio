@@ -42,13 +42,14 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
   backImage = CardBack
 
   /**
-   * A choice of a card during the setup is a click (as on BGA): a starting musician to take, a card of the draft packet
-   * to keep. Anywhere else, a click opens the help of the card.
+   * A click on a card plays its move when it has only one (Ludo, 19/11/2026: "il faudrait simplement cliquer dessus et
+   * elles se positionnent seules"): a card of the hand goes to the partners or to the discard, a partner is taken back,
+   * a card is chosen. With several destinations (the piles of Contacts…), the card is dragged; the framework only plays
+   * a click when one move matches. Without a move, a click opens the help of the card.
    */
   canShortClick(move: MaterialMove, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
-    if (!isMoveItemType(MaterialType.CharacterCard)(move) || move.itemIndex !== context.index) return false
-    const location = context.rules.material(MaterialType.CharacterCard).getItem(context.index).location.type
-    return location === LocationType.StartingMusicians || location === LocationType.DraftPacket
+    if (isMoveItemType(MaterialType.CharacterCard)(move)) return move.itemIndex === context.index
+    return (isCustomMoveType(CustomMoveType.TakeBack)(move) || isCustomMoveType(CustomMoveType.ChooseCard)(move)) && move.data === context.index
   }
 }
 

@@ -49,10 +49,13 @@ export const contactStep = 1.3
 /** The first player card and the cards discarded during the turn, in a column on the left of the board. */
 export const leftColumnX = -boardWidth / 2 - gap - cardWidth / 2
 
-/** Partner musicians on the right of the board, apprentices under them. */
+/**
+ * Partner musicians on the right of the board, apprentices under them: each row in front of its label printed on the
+ * right edge of the board, "Musiciens Partenaires" on the top half, "Apprentis Partenaires" on the bottom half.
+ */
 export const partnersX = boardWidth / 2 + gap + cardWidth / 2
-export const musiciansY = -boardHeight / 2 + cardHeight / 2
-export const apprenticesY = musiciansY + cardHeight + cardGap
+export const musiciansY = -boardHeight / 4
+export const apprenticesY = boardHeight / 4
 
 /** The hand under the board, the reserve of tokens on its left. */
 export const handX = -boardWidth / 2 + cardWidth / 2

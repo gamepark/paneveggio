@@ -276,18 +276,8 @@ export const HandLimitHeader = () => {
   return <PlayerHeader name="hand-limit" values={{ n }} />
 }
 
-export const ConservationHeader = () => (
-  <PlayerHeader
-    name="conservation"
-    components={{ done: <PlayMoveButton move={usePass()} /> }}
-    after={
-      <>
-        {' '}
-        <CardButtons type={CustomMoveType.TakeBack} />
-      </>
-    }
-  />
-)
+/** The cards are placed and taken back with a click on them (CharacterCardDescription.canShortClick). */
+export const ConservationHeader = () => <PlayerHeader name="conservation" components={{ done: <PlayMoveButton move={usePass()} /> }} />
 
 /** The turn ends by itself after 10 seconds: until then, the player can still undo (game-park skill). */
 export const EndTurnHeader = () => {

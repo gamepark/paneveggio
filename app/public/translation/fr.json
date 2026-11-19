@@ -82,7 +82,7 @@
   "header.hand-limit": "{player} doit défausser jusqu’à 10 cartes",
   "header.hand-limit.you": "Défaussez {n, plural, one {# carte} other {# cartes}} (10 cartes en main au maximum)",
   "header.conservation": "{player} pose ou reprend des cartes",
-  "header.conservation.you": "Posez des cartes de votre main ou reprenez des cartes Partenaires, puis <done>terminez</done>",
+  "header.conservation.you": "Cliquez sur une carte de votre main pour la poser, sur un Partenaire pour le reprendre, puis <done>terminez</done>",
   "header.end-turn": "{player} termine son tour",
   "header.end-turn.you": "<end>Terminer le tour</end>",
   "header.final-sheet-music": "{player} peut modifier sa partition une dernière fois",
