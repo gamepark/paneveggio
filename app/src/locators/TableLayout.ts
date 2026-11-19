@@ -5,8 +5,9 @@ import { MaterialRules, XYCoordinates } from '@gamepark/rules-api'
 
 /**
  * The whole table, in centimetres, at the scale of the real components (decision of 19/11/2026, like D6 on BGA):
- * - the area of the player who looks at the table, full size, its board centred on the origin;
- * - the Master Luthier board above the partner musicians of that player, the draw pile on its right;
+ * - one player area full size, its board centred on the origin: the area of the player who looks at the table, or
+ *   the one they chose to look at by clicking a panel or a board (decision of 19/11/2026);
+ * - the Master Luthier board above the partner musicians of that area, the draw pile on its right;
  * - the areas of the other players in a column on the right, smaller.
  * Nothing is ever rotated: everyone reads the table the same way.
  */
@@ -67,10 +68,13 @@ const deepestContacts = (rules: Rules, player: PlayerColor) =>
 
 type Rect = { left: number; right: number; top: number; bottom: number }
 
-/** The rectangle covered by a player area, from the centre of its board, full size. */
-const playerArea = (rules: Rules, player: PlayerColor, isViewer: boolean): Rect => {
+/**
+ * The rectangle covered by a player area, from the centre of its board, full size.
+ * The Contacts are in steps only for their owner, when their area is the one displayed large.
+ */
+const playerArea = (rules: Rules, player: PlayerColor, viewer?: PlayerColor): Rect => {
   const partners = Math.max(reservedPartners, countCards(rules, LocationType.PartnerMusicians, player), countCards(rules, LocationType.PartnerApprentices, player))
-  const depth = isViewer ? deepestContacts(rules, player) - 1 : 0
+  const depth = contactsInSteps(rules, player, viewer) ? deepestContacts(rules, player) - 1 : 0
   return {
     left: leftColumnX - cardWidth / 2,
     right: partnersX - cardWidth / 2 + partners * cardPitch - cardGap,
@@ -81,14 +85,26 @@ const playerArea = (rules: Rules, player: PlayerColor, isViewer: boolean): Rect 
 
 // ------------------------------------------------------------------ players
 
-/** The players in the order of the table, starting with the one who looks at it (the first player for a spectator). */
-export const playersFromViewer = (rules: Rules, viewer?: PlayerColor): PlayerColor[] => {
-  const start = Math.max(0, viewer === undefined ? 0 : rules.players.indexOf(viewer))
+/**
+ * The player whose area is displayed large: the one whose panel or board was clicked last, which the framework keeps
+ * in `game.view` (a local move, never sent to the server), or else the player who looks at the table, or else the
+ * first player for a spectator (as in Greylune).
+ */
+export const getDisplayedPlayer = (rules: Rules, viewer?: PlayerColor): PlayerColor =>
+  (rules.game.view as PlayerColor | undefined) ?? viewer ?? rules.players[0]
+
+/** The players in the order of the table, starting with the one displayed large. */
+export const playersFromDisplayed = (rules: Rules, viewer?: PlayerColor): PlayerColor[] => {
+  const start = Math.max(0, rules.players.indexOf(getDisplayedPlayer(rules, viewer)))
   return [...rules.players.slice(start), ...rules.players.slice(0, start)]
 }
 
-/** 0 for the player who looks at the table, then 1, 2… for the others in the order of play. */
-export const getSeat = (rules: Rules, player: PlayerColor, viewer?: PlayerColor) => playersFromViewer(rules, viewer).indexOf(player)
+/** 0 for the player displayed large, then 1, 2… for the others in the order of play. */
+export const getSeat = (rules: Rules, player: PlayerColor, viewer?: PlayerColor) => playersFromDisplayed(rules, viewer).indexOf(player)
+
+/** The owner of the Contacts sees the banner of each card under the top one, when their area is displayed large. */
+export const contactsInSteps = (rules: Rules, player: PlayerColor, viewer?: PlayerColor) =>
+  player === viewer && getSeat(rules, player, viewer) === 0
 
 export const seatScale = (seat: number) => (seat === 0 ? 1 : opponentScale)
 
@@ -106,37 +122,35 @@ export const deckCenter: XYCoordinates = { x: masterBoardCenter.x + masterWidth 
 
 // ------------------------------------------------------------------ boards on the table
 
-/** Left edge of the column of the other players: on the right of the viewer's area and of the draw pile. */
-const opponentsLeft = (rules: Rules, viewer?: PlayerColor) => {
-  const me = playersFromViewer(rules, viewer)[0]
-  return Math.max(playerArea(rules, me, true).right, deckCenter.x + cardWidth / 2) + 2 * gap
-}
+/** Left edge of the column of the other players: on the right of the large area and of the draw pile. */
+const othersLeft = (rules: Rules, viewer?: PlayerColor) =>
+  Math.max(playerArea(rules, getDisplayedPlayer(rules, viewer), viewer).right, deckCenter.x + cardWidth / 2) + 2 * gap
 
-/** Centre of the board of a player on the table. */
+/** Centre of the board of a player on the table: the one displayed large on the origin, the others in the column. */
 export const boardCenter = (rules: Rules, player: PlayerColor, viewer?: PlayerColor): XYCoordinates => {
-  const players = playersFromViewer(rules, viewer)
+  const players = playersFromDisplayed(rules, viewer)
   const seat = players.indexOf(player)
   if (seat <= 0) return { x: 0, y: 0 }
-  const left = opponentsLeft(rules, viewer)
-  let top = Math.min(masterTop, playerArea(rules, players[0], true).top)
+  const left = othersLeft(rules, viewer)
+  let top = Math.min(masterTop, playerArea(rules, players[0], viewer).top)
   for (const other of players.slice(1, seat)) {
-    const area = playerArea(rules, other, false)
+    const area = playerArea(rules, other, viewer)
     top += (area.bottom - area.top) * opponentScale + 2 * gap
   }
-  const area = playerArea(rules, player, false)
+  const area = playerArea(rules, player, viewer)
   return { x: left - area.left * opponentScale, y: top - area.top * opponentScale }
 }
 
 /** The table is exactly as large as what lies on it. */
 export const tableBoundaries = (rules: Rules, viewer?: PlayerColor) => {
-  const players = playersFromViewer(rules, viewer)
-  const me = playerArea(rules, players[0], true)
-  const { left } = me
-  let { right, top, bottom } = me
+  const players = playersFromDisplayed(rules, viewer)
+  const large = playerArea(rules, players[0], viewer)
+  const { left } = large
+  let { right, top, bottom } = large
   right = Math.max(right, deckCenter.x + cardWidth / 2)
   top = Math.min(top, masterTop)
   for (const player of players.slice(1)) {
-    const area = playerArea(rules, player, false)
+    const area = playerArea(rules, player, viewer)
     const center = boardCenter(rules, player, viewer)
     right = Math.max(right, center.x + area.right * opponentScale)
     bottom = Math.max(bottom, center.y + area.bottom * opponentScale)

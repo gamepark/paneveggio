@@ -10,6 +10,7 @@ import {
   cardPitch,
   contactsY,
   contactStep,
+  contactsInSteps,
   contactX,
   getSeat,
   handGap,
@@ -27,7 +28,8 @@ type Context = MaterialContext<PlayerColor, MaterialType, LocationType>
 type ItemCtx = ItemContext<PlayerColor, MaterialType, LocationType>
 type Loc = Location<PlayerColor, LocationType>
 
-const isViewer = (location: Loc, context: Context) => getSeat(context.rules, location.player!, context.player) === 0
+/** The owner of the cards sees their faces. */
+const isOwner = (location: Loc, context: Context) => location.player === context.player
 
 /** The board of a player, smaller for the other players. Everything in a player area is placed on it, so it follows. */
 export class PlayerBoardLocator extends Locator<PlayerColor, MaterialType, LocationType> {
@@ -74,7 +76,7 @@ export class ContactsLocator extends Locator<PlayerColor, MaterialType, Location
   getItemCoordinates(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
     const { x = 0, y = 0 } = this.getCoordinates(item.location)
     const depth = item.location.x ?? 0
-    const step = isViewer(item.location, context) ? contactStep : 0.05
+    const step = contactsInSteps(context.rules, item.location.player!, context.player) ? contactStep : 0.05
     return { x, y: y - depth * step, z: (10 - depth) * 0.05 }
   }
 
@@ -116,14 +118,14 @@ export class PartnerApprenticesLocator extends ListLocator<PlayerColor, Material
   }
 }
 
-/** The viewer's hand is spread under the board. The hands of the others are face-down piles. */
+/** A hand is spread under the board for its owner. The hands of the others are face-down piles. */
 export class PlayerHandLocator extends ListLocator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.PlayerBoard
   getParentItem = playerBoard
   coordinates = { x: handX, y: handY }
 
   getGap(location: Loc, context: Context) {
-    if (!isViewer(location, context)) return { x: 0.05, y: -0.05 }
+    if (!isOwner(location, context)) return { x: 0.05, y: -0.05 }
     return { x: handGap(this.countListItems(location, context)) }
   }
 

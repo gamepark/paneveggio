@@ -1,7 +1,8 @@
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
-import { BoardDescription, CardDescription, MaterialContext, MaterialDescription, SoundKit, TokenDescription } from '@gamepark/react-game'
+import { BoardDescription, CardDescription, ItemContext, MaterialContext, MaterialDescription, SoundKit, TokenDescription } from '@gamepark/react-game'
+import { MaterialItem, MaterialMoveBuilder } from '@gamepark/rules-api'
 import {
   CardBack,
   characterImagesEn,
@@ -14,7 +15,7 @@ import {
   PlayerBoardFr,
   violinImages
 } from '../images/Images'
-import { boardHeight, boardWidth, cardHeight, cardRadius, cardWidth, masterHeight, masterWidth, tokenImageSize } from '../locators/TableLayout'
+import { boardHeight, boardWidth, cardHeight, cardRadius, cardWidth, getDisplayedPlayer, masterHeight, masterWidth, tokenImageSize } from '../locators/TableLayout'
 
 /**
  * The English images are the default ones, shown in every language but French (decision of 09/11/2026 on BGA):
@@ -49,6 +50,13 @@ class PlayerBoardDescription extends BoardDescription<PlayerColor, MaterialType,
 
   getStaticItems(context: MaterialContext<PlayerColor, MaterialType, LocationType>) {
     return context.rules.players.map((player) => ({ location: { type: LocationType.PlayerBoard, player } }))
+  }
+
+  /** A click on a small board displays that player area large (decision of 19/11/2026); on the large one, its help. */
+  displayHelp(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    const player = item.location.player!
+    if (player !== getDisplayedPlayer(context.rules, context.player)) return MaterialMoveBuilder.changeView(player)
+    return super.displayHelp(item, context)
   }
 }
 
