@@ -93,3 +93,16 @@ export const relationPoints = (hand: number[], relationApprentices: number[]): R
   for (const card of hand) augment(card, new Set())
   return Object.fromEntries(relationApprentices.map((card) => [card, assigned[card].length]))
 }
+
+/**
+ * Score shown during the game (decision D6, 09/11/2026): the Prestige of the violins minus the help tokens. The points
+ * of the apprentices only count at the final scoring, which replaces it.
+ */
+export const currentScore = (game: GameMaterial, player: PlayerColor): number => {
+  const table = new Table(game)
+  const violins = table
+    .madeViolins(player)
+    .getIndexes()
+    .reduce((sum, violin) => sum + table.prestige(violin), 0)
+  return violins - table.helpTokens(player).length
+}

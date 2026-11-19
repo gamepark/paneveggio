@@ -5,13 +5,18 @@ import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { StyledPlayerPanel, usePlay, usePlayerId, usePlayers, useRules } from '@gamepark/react-game'
+import { computeScore, currentScore } from '@gamepark/paneveggio/logic/Scoring'
+import { Table } from '@gamepark/paneveggio/logic/Table'
 import { MaterialMoveBuilder, MaterialRules } from '@gamepark/rules-api'
 import { createPortal } from 'react-dom'
+import { CardBack, Ducat, Star, Study, violinImages, Wood } from '../images/Images'
 import { getDisplayedPlayer } from '../locators/TableLayout'
 
 /**
  * A click on a panel displays that player area large (decision of 19/11/2026). The panel of the area displayed large
  * is outlined; the others show an eye.
+ * Counters (decision D6, as on BGA): the score, then violins crafted /12, ducats, studies, woods in stock, cards in hand.
+ * The score is the Prestige of the violins minus the help during the game, the final scoring once it is over.
  */
 export const PlayerPanels = () => {
   const players = usePlayers<PlayerColor>({ sortFromMe: true })
@@ -23,6 +28,8 @@ export const PlayerPanels = () => {
     return null
   }
   const displayed = getDisplayedPlayer(rules, me)
+  const table = new Table(rules)
+  const over = rules.isOver()
 
   return createPortal(
     <>
@@ -31,6 +38,15 @@ export const PlayerPanels = () => {
           <StyledPlayerPanel
             player={player}
             activeRing
+            mainCounter={{ image: Star, value: over ? computeScore(rules, player.id).total : currentScore(rules, player.id) }}
+            counters={[
+              { image: violinImages[player.id], value: `${table.madeViolins(player.id).length}/12` },
+              { image: Ducat, value: table.ducats(player.id).length },
+              { image: Study, value: table.studies(player.id).length },
+              { image: Wood, value: table.woods(player.id).length },
+              { image: CardBack, value: table.hand(player.id).length }
+            ]}
+            countersPerLine={3}
             onClick={() => play(MaterialMoveBuilder.changeView(player.id), { transient: true })}
             css={[clickable, player.id === displayed && displayedPanel]}
           />

@@ -1,5 +1,9 @@
+import { css, keyframes } from '@emotion/react'
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
+import { Memory } from '@gamepark/paneveggio/material/Memory'
+import { RuleId } from '@gamepark/paneveggio/rules/RuleId'
+import { Task } from '@gamepark/paneveggio/rules/Task'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { BoardDescription, CardDescription, ItemContext, MaterialContext, MaterialDescription, SoundKit, TokenDescription } from '@gamepark/react-game'
 import { CustomMoveType, NoteMove, NoteMoveType, Resource } from '@gamepark/paneveggio/material/CustomMoveType'
@@ -142,6 +146,18 @@ abstract class WoodenTokenDescription<Id = PlayerColor> extends TokenDescription
   soundKit = SoundKit.Wood
 }
 
+const pulse = keyframes`
+  from {
+    filter: drop-shadow(0 0 0.1em #ffd84a) drop-shadow(0 0 0.1em #ffd84a);
+  }
+  to {
+    filter: drop-shadow(0 0 0.35em #ffd84a) drop-shadow(0 0 0.2em #ffd84a);
+  }
+`
+const noteGlow = css`
+  animation: ${pulse} 0.8s ease-in-out infinite alternate;
+`
+
 class NoteTokenDescription extends WoodenTokenDescription<undefined> {
   image = Note
 
@@ -151,6 +167,18 @@ class NoteTokenDescription extends WoodenTokenDescription<undefined> {
       .filter(isCustomMoveType<CustomMoveType, NoteMove>(CustomMoveType.MoveNote))
       .filter((move) => move.data?.beat === item.location.x && item.location.type === LocationType.SheetMusic)
     return moves.length ? createElement(NoteMenu, { moves }) : undefined
+  }
+
+  /** The notes of the action being played shine, so that everyone sees where the turn is on the sheet music. */
+  highlight(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    const task = context.rules.remind<Task[] | undefined>(Memory.Tasks)?.[0]
+    if (task?.rule !== RuleId.PlayAction || item.location.type !== LocationType.SheetMusic || item.location.player !== task.player) return undefined
+    return task.beats?.includes(item.location.x!) || undefined
+  }
+
+  /** A black disc hardly shows the default shine: a golden halo pulses around it. */
+  getHighlightCss(itemId: undefined, image?: string) {
+    return [super.getHighlightCss(itemId, image), noteGlow]
   }
 }
 

@@ -6,7 +6,9 @@ import MasterBoard from './boards/master.webp'
 import CardBack from './cards/back.webp'
 import FirstPlayerCard from './cards/first-player.webp'
 import Ducat from './icons/ducat.webp'
+import Star from './icons/star.svg?no-inline'
 import Study from './icons/study.webp'
+import Wood from './icons/wood.svg?no-inline'
 import LutherieBlue from './tokens/lutherie-blue.webp'
 import LutherieGreen from './tokens/lutherie-green.webp'
 import LutherieOrange from './tokens/lutherie-orange.webp'
@@ -17,7 +19,7 @@ import ViolinGreen from './tokens/violin-green.webp'
 import ViolinOrange from './tokens/violin-orange.webp'
 import ViolinRed from './tokens/violin-red.webp'
 
-export { CardBack, Ducat, FirstPlayerCard, MasterBoard, Note, PlayerBoardEn, PlayerBoardFr, Study }
+export { CardBack, Ducat, FirstPlayerCard, MasterBoard, Note, PlayerBoardEn, PlayerBoardFr, Star, Study, Wood }
 
 /** Card number -> image, from the file name (`<nn>.webp`). */
 const byNumber = (files: Record<string, string>): Record<number, string> =>
