@@ -173,12 +173,11 @@ export class ChooseStartingMusicianRule extends PaneveggioTurnRule {
     }
     if (isShuffleItemType(MaterialType.CharacterCard)(move)) {
       const deck = new Table(this).deck.sort((item) => -(item.location.x ?? 0))
-      const moves: Move[] = [2, 3, 4].map((prestige) =>
-        deck
-          .filter<number>((item) => isMusician(item.id) && getPrestige(item.id) === prestige)
-          .limit(1)
-          .moveItem({ type: LocationType.MasterMusician, id: prestige })
-      )
+      // In the browser, the cards of the draw pile are hidden: nothing is found (the moves played come from the server).
+      const moves: Move[] = [2, 3, 4].flatMap((prestige) => {
+        const musician = deck.filter<number>((item) => isMusician(item.id) && getPrestige(item.id) === prestige).limit(1)
+        return musician.length ? [musician.moveItem({ type: LocationType.MasterMusician, id: prestige })] : []
+      })
       return [...moves, this.startSimultaneousRule(RuleId.ArrangeStart)]
     }
     return []

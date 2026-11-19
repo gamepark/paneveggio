@@ -33,3 +33,25 @@ export const NoteMenu = ({ moves }: { moves: CustomMove<CustomMoveType, NoteMove
     </>
   )
 }
+
+/** On the player board (cm from its centre): left and right of the staff, at the height of its middle line. */
+const staffY = 21 * (0.303 - 0.5)
+
+/** Shift all the notes one beat left or right: the first note becomes the last one, or the reverse (RULES p. 9). */
+export const ShiftMenu = ({ left, right }: { left?: CustomMove<CustomMoveType, NoteMove>; right?: CustomMove<CustomMoveType, NoteMove> }) => {
+  const { t } = useTranslation()
+  return (
+    <>
+      {left && (
+        <ItemMenuButton move={left} label={t('note.shift-left')} labelPosition="left" x={29 * (0.31 - 0.5)} y={staffY}>
+          ⇠
+        </ItemMenuButton>
+      )}
+      {right && (
+        <ItemMenuButton move={right} label={t('note.shift-right')} labelPosition="right" x={29 * (0.81 - 0.5)} y={staffY}>
+          ⇢
+        </ItemMenuButton>
+      )}
+    </>
+  )
+}

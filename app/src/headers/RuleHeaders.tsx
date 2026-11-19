@@ -1,4 +1,4 @@
-import { CustomMoveType, NoteMoveType, Pick, Sequence } from '@gamepark/paneveggio/material/CustomMoveType'
+import { CustomMoveType, Pick, Sequence } from '@gamepark/paneveggio/material/CustomMoveType'
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PaneveggioRules } from '@gamepark/paneveggio/PaneveggioRules'
@@ -63,19 +63,7 @@ export const SpreadReturnedTokensHeader = () => {
 export const SheetMusicHeader = () => {
   const workshop = useLegalMove(isCustom(CustomMoveType.ChooseSequence, Sequence.Workshop))
   const conservation = useLegalMove(isCustom(CustomMoveType.ChooseSequence, Sequence.Conservation))
-  const left = useLegalMove(isCustom(CustomMoveType.MoveNote, { type: NoteMoveType.ShiftLeft }))
-  const right = useLegalMove(isCustom(CustomMoveType.MoveNote, { type: NoteMoveType.ShiftRight }))
-  return (
-    <PlayerHeader
-      name="sheet-music"
-      components={{
-        workshop: <PlayMoveButton move={workshop} />,
-        conservation: <PlayMoveButton move={conservation} />,
-        left: <PlayMoveButton move={left} />,
-        right: <PlayMoveButton move={right} />
-      }}
-    />
-  )
+  return <PlayerHeader name="sheet-music" components={{ workshop: <PlayMoveButton move={workshop} />, conservation: <PlayMoveButton move={conservation} /> }} />
 }
 
 // ------------------------------------------------------------------ Workshop
@@ -226,15 +214,7 @@ export const DallAbacoHeader = () => <PlayerHeader name="dall-abaco" components=
 
 export const MoveNotesHeader = () => {
   const task = useTask()
-  const left = useLegalMove(isCustom(CustomMoveType.MoveNote, { type: NoteMoveType.ShiftLeft }))
-  const right = useLegalMove(isCustom(CustomMoveType.MoveNote, { type: NoteMoveType.ShiftRight }))
-  return (
-    <PlayerHeader
-      name="move-notes"
-      values={{ count: task?.count }}
-      components={{ left: <PlayMoveButton move={left} />, right: <PlayMoveButton move={right} />, pass: <PlayMoveButton move={usePass()} /> }}
-    />
-  )
+  return <PlayerHeader name="move-notes" values={{ count: task?.count }} components={{ pass: <PlayMoveButton move={usePass()} /> }} />
 }
 
 export const RameauHeader = () => <PlayerHeader name="rameau" components={{ pass: <PlayMoveButton move={usePass()} /> }} />
@@ -315,15 +295,6 @@ export const EndTurnHeader = () => {
   return <PlayerHeader name="end-turn" components={{ end: <PlayMoveButton move={end} auto={10} /> }} />
 }
 
-export const FinalSheetMusicHeader = () => {
-  const left = useLegalMove(isCustom(CustomMoveType.MoveNote, { type: NoteMoveType.ShiftLeft }))
-  const right = useLegalMove(isCustom(CustomMoveType.MoveNote, { type: NoteMoveType.ShiftRight }))
-  return (
-    <PlayerHeader
-      name="final-sheet-music"
-      components={{ left: <PlayMoveButton move={left} />, right: <PlayMoveButton move={right} />, done: <PlayMoveButton move={usePass()} /> }}
-    />
-  )
-}
+export const FinalSheetMusicHeader = () => <PlayerHeader name="final-sheet-music" components={{ done: <PlayMoveButton move={usePass()} /> }} />
 
 export const FinalApprenticesHeader = () => <PlayerHeader name="final-apprentices" components={{ done: <PlayMoveButton move={usePass()} /> }} />

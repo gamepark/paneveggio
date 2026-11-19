@@ -2,12 +2,12 @@ import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { BoardDescription, CardDescription, ItemContext, MaterialContext, MaterialDescription, SoundKit, TokenDescription } from '@gamepark/react-game'
-import { CustomMoveType, NoteMove, Resource } from '@gamepark/paneveggio/material/CustomMoveType'
-import { isCustomMoveType, MaterialItem, MaterialMove, MaterialMoveBuilder } from '@gamepark/rules-api'
+import { CustomMoveType, NoteMove, NoteMoveType, Resource } from '@gamepark/paneveggio/material/CustomMoveType'
+import { isCustomMoveType, isMoveItemType, MaterialItem, MaterialMove, MaterialMoveBuilder } from '@gamepark/rules-api'
 import { createElement } from 'react'
-import { helpAreaPosition } from '../locators/TableLayout'
+import { bandPosition, helpDucatX, helpStudyX } from '../locators/MasterBoardLayout'
 import { HelpMenu } from './HelpMenu'
-import { NoteMenu } from './NoteMenu'
+import { NoteMenu, ShiftMenu } from './NoteMenu'
 import {
   CardBack,
   characterImagesEn,
@@ -36,6 +36,16 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
   borderRadius = cardRadius
   images = characterImagesEn
   backImage = CardBack
+
+  /**
+   * A choice of a card during the setup is a click (as on BGA): a starting musician to take, a card of the draft packet
+   * to keep. Anywhere else, a click opens the help of the card.
+   */
+  canShortClick(move: MaterialMove, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    if (!isMoveItemType(MaterialType.CharacterCard)(move) || move.itemIndex !== context.index) return false
+    const location = context.rules.material(MaterialType.CharacterCard).getItem(context.index).location.type
+    return location === LocationType.StartingMusicians || location === LocationType.DraftPacket
+  }
 }
 
 class FrenchCharacterCardDescription extends CharacterCardDescription {
@@ -48,6 +58,11 @@ class StartingCardDescription extends CardDescription<PlayerColor, MaterialType,
   height = cardHeight
   borderRadius = cardRadius
   images = startingImagesEn
+
+  /** Choose a starting deck with a click on its card. */
+  canShortClick(move: MaterialMove, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    return isMoveItemType(MaterialType.StartingCard)(move) && move.itemIndex === context.index
+  }
 }
 
 class FrenchStartingCardDescription extends StartingCardDescription {
@@ -71,6 +86,20 @@ class PlayerBoardDescription extends BoardDescription<PlayerColor, MaterialType,
     return context.rules.players.map((player) => ({ location: { type: LocationType.PlayerBoard, player } }))
   }
 
+  isMenuAlwaysVisible() {
+    return true
+  }
+
+  /** The shifts of the whole sheet music (RULES p. 9), on each side of the staff of the player. */
+  getItemMenu(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>, legalMoves: MaterialMove[]) {
+    if (item.location.player !== context.player) return undefined
+    const moves = legalMoves.filter(isCustomMoveType<CustomMoveType, NoteMove>(CustomMoveType.MoveNote))
+    const left = moves.find((move) => move.data?.type === NoteMoveType.ShiftLeft)
+    const right = moves.find((move) => move.data?.type === NoteMoveType.ShiftRight)
+    if (!left && !right) return undefined
+    return createElement(ShiftMenu, { left, right })
+  }
+
   /** A click on a small board displays that player area large (decision of 19/11/2026); on the large one, its help. */
   displayHelp(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     const player = item.location.player!
@@ -89,6 +118,8 @@ class MasterBoardDescription extends BoardDescription<PlayerColor, MaterialType,
   height = masterHeight
   image = MasterBoard
   staticItem = { location: { type: LocationType.MasterBoard } }
+  /** The extra costs and the texts of the help area are drawn on the board (MasterBoardTexts). */
+  locations = [1, 2, 3, 4].map((id) => ({ type: LocationType.MasterMusician, id })).concat({ type: LocationType.HelpArea, id: 0 })
 
   isMenuAlwaysVisible() {
     return true
@@ -98,7 +129,8 @@ class MasterBoardDescription extends BoardDescription<PlayerColor, MaterialType,
   getItemMenu(_item: MaterialItem<PlayerColor, LocationType>, _context: ItemContext<PlayerColor, MaterialType, LocationType>, legalMoves: MaterialMove[]) {
     const moves = legalMoves.filter(isCustomMoveType<CustomMoveType, Resource>(CustomMoveType.AskForHelp))
     if (!moves.length) return undefined
-    return createElement(HelpMenu, { moves, x: masterWidth * (helpAreaPosition.x / 100 - 0.5), y: masterHeight * (helpAreaPosition.y / 100 - 0.5) })
+    const y = masterHeight * (bandPosition.y / 100 - 0.5)
+    return createElement(HelpMenu, { moves, ducat: { x: helpDucatX, y }, study: { x: helpStudyX, y } })
   }
 }
 

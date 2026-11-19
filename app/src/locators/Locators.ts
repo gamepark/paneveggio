@@ -16,13 +16,16 @@ import {
   PlayerHandLocator,
   ReserveLocator,
   ReturnedTokensLocator,
+  StartingCardsLocator,
   SheetMusicLocator,
   studiesLocator,
   TurnDiscardLocator,
   WoodStockLocator
 } from './PlayerAreaLocators'
 import { cardHoverTransform } from './CardHover'
-import { cardPitch, deckCenter, helpAreaPosition, masterBoardCenter, masterHeight } from './TableLayout'
+import { bandPosition, helpTokensX } from './MasterBoardLayout'
+import { MasterBandDescription, MasterCostDescription } from './MasterBoardTexts'
+import { cardPitch, deckCenter, masterBoardCenter, masterHeight } from './TableLayout'
 
 /**
  * The 4 musicians of the Master Luthier board, on its illustration, each one above its column of the green band
@@ -32,6 +35,8 @@ const masterSlotX: Record<number, number> = { 1: 17.72, 2: 39.17, 3: 60.61, 4: 8
 
 class MasterMusicianLocator extends Locator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.MasterBoard
+  /** The extra cost of the column, under the card (MasterBoardTexts). */
+  locationDescription = new MasterCostDescription()
 
   getPositionOnParent(location: Location<PlayerColor, LocationType>) {
     return { x: masterSlotX[location.id], y: 32 }
@@ -39,6 +44,22 @@ class MasterMusicianLocator extends Locator<PlayerColor, MaterialType, LocationT
 
   getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     return cardHoverTransform(item, context)
+  }
+}
+
+/**
+ * The help area of the Master Luthier board: the brown band at the bottom, with its texts (MasterBoardTexts); the tokens
+ * blocked there are piled on its left.
+ */
+class HelpAreaLocator extends PileLocator<PlayerColor, MaterialType, LocationType> {
+  parentItemType = MaterialType.MasterBoard
+  positionOnParent = bandPosition
+  radius = { x: 1.6, y: 0.5 }
+  locationDescription = new MasterBandDescription()
+
+  getItemCoordinates(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    const { x = 0, y = 0, z = 0 } = super.getItemCoordinates(item, context)
+    return { x: x + helpTokensX, y, z }
   }
 }
 
@@ -74,10 +95,10 @@ class OnViolinLocator extends Locator<PlayerColor, MaterialType, LocationType> {
 export const Locators: Partial<Record<LocationType, Locator<PlayerColor, MaterialType, LocationType>>> = {
   [LocationType.MasterBoard]: new Locator({ coordinates: masterBoardCenter }),
   [LocationType.MasterMusician]: new MasterMusicianLocator(),
-  [LocationType.HelpArea]: new PileLocator({ parentItemType: MaterialType.MasterBoard, positionOnParent: helpAreaPosition, radius: { x: 3, y: 0.8 } }),
+  [LocationType.HelpArea]: new HelpAreaLocator(),
   [LocationType.Deck]: new DeckLocator({ coordinates: deckCenter }),
   // Setup only: the starting cards and the starting musicians, in a row on the Master Luthier board.
-  [LocationType.StartingCards]: new ListLocator({ coordinates: { x: masterBoardCenter.x - 2 * cardPitch, y: masterBoardCenter.y - masterHeight / 2 + 4.5 }, gap: { x: cardPitch } }),
+  [LocationType.StartingCards]: new StartingCardsLocator(),
   [LocationType.StartingMusicians]: new ListLocator({ coordinates: { x: masterBoardCenter.x - 2 * cardPitch, y: masterBoardCenter.y - masterHeight / 2 + 4.5 }, gap: { x: cardPitch } }),
   [LocationType.PlayerBoard]: new PlayerBoardLocator(),
   [LocationType.FirstPlayer]: new FirstPlayerLocator(),

@@ -18,6 +18,8 @@ import {
   handY,
   layoutDependencies,
   leftColumnX,
+  masterBoardCenter,
+  masterHeight,
   musiciansY,
   partnersX,
   seatScale
@@ -142,6 +144,24 @@ export class DraftPacketLocator extends ListLocator<PlayerColor, MaterialType, L
 
   getGap(location: Loc, context: Context) {
     return isOwner(location, context) ? { x: cardPitch * 0.75 } : { x: 0.05, y: -0.05 }
+  }
+}
+
+/**
+ * Setup "Players choose": the starting cards left to choose, in a row on the Master Luthier board; a chosen one next to
+ * the board of its player, where the discard of the turn will be.
+ */
+export class StartingCardsLocator extends ListLocator<PlayerColor, MaterialType, LocationType> {
+  parentItemType = MaterialType.PlayerBoard
+  gap = { x: cardPitch }
+
+  getParentItem(location: Loc) {
+    return location.player === undefined ? undefined : playerBoard(location)
+  }
+
+  getCoordinates(location: Loc) {
+    if (location.player !== undefined) return { x: leftColumnX, y: musiciansY }
+    return { x: masterBoardCenter.x - 2 * cardPitch, y: masterBoardCenter.y - masterHeight / 2 + 4.5 }
   }
 }
 

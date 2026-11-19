@@ -117,9 +117,6 @@ export const masterBoardCenter: XYCoordinates = {
 }
 const masterTop = masterBoardCenter.y - masterHeight / 2
 
-/** The help area of the Master Luthier board, in % of the board: the brown band at the bottom, on the left. */
-export const helpAreaPosition = { x: 25, y: 87 }
-
 /** The draw pile, on the right of the Master Luthier board. */
 export const deckCenter: XYCoordinates = { x: masterBoardCenter.x + masterWidth / 2 + gap + cardWidth / 2, y: masterBoardCenter.y }
 

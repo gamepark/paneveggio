@@ -95,6 +95,11 @@
   "note.up": "Monter la note",
   "note.down": "Descendre la note",
   "note.swap": "Échanger avec la suivante",
-  "help-area.ducat": "Aide du Maître Luthier : 1 ducat",
-  "help-area.study": "Aide du Maître Luthier : 1 étude"
+  "help-area.ducat": "Aide du Maître Luthier : 1 jeton bloqué (−1 PP) pour 1 ducat",
+  "help-area.study": "Aide du Maître Luthier : 1 jeton bloqué (−1 PP) pour 1 étude",
+  "note.shift-left": "Décaler à gauche",
+  "note.shift-right": "Décaler à droite",
+  "master.help-area": "Zone d’aide",
+  "master.end-of-game": "Fin de partie",
+  "master.pp": "PP"
 }
