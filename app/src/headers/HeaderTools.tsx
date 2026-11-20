@@ -6,6 +6,7 @@ import { PlayMoveButton, useLegalMoves, usePlayerId, usePlayerName, useRules } f
 import { isCustomMoveType } from '@gamepark/rules-api'
 import { ReactElement, ReactNode } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import { CardPreview } from './CardPreview'
 import { cardName, Move } from './HeaderUtils'
 
 /** Buttons for the legal custom moves of a type, each with its label. */
@@ -22,11 +23,15 @@ export const MoveButtons = ({ type, label, filter }: { type: CustomMoveType; lab
   )
 }
 
-/** Buttons to choose a card (custom move with the index of the card as data), labelled with the name of the card. */
+/** Buttons to choose a card (custom move with the index of the card as data), labelled with the name of the card, which shows under the pointer. */
 export const CardButtons = ({ type }: { type: CustomMoveType }) => {
   const { t } = useTranslation()
   const rules = useRules<PaneveggioRules>()!
-  return <MoveButtons type={type} label={(move) => cardName(t, rules.material(MaterialType.CharacterCard).getItem<number>((move as { data: number }).data).id)} />
+  const label = (move: Move) => {
+    const card = rules.material(MaterialType.CharacterCard).getItem<number>((move as { data: number }).data).id
+    return <CardPreview card={card}>{cardName(t, card)}</CardPreview>
+  }
+  return <MoveButtons type={type} label={label} />
 }
 
 type HeaderProps = {

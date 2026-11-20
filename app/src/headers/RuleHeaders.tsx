@@ -8,6 +8,7 @@ import { CopyMode, DiscardReward } from '@gamepark/paneveggio/rules/Task'
 import { PlayMoveButton, useLegalMove, useLegalMoves, usePlayerId, useRules } from '@gamepark/react-game'
 import { isCustomMoveType, isMoveItemType } from '@gamepark/rules-api'
 import { useTranslation } from 'react-i18next'
+import { CardPreview } from './CardPreview'
 import { CardButtons, MoveButtons, PlayerHeader, SimultaneousHeader } from './HeaderTools'
 import { cardName, isCustom, Move, usePass, useTask } from './HeaderUtils'
 
@@ -77,8 +78,8 @@ export const PlayActionHeader = () => {
   const apprentice = (move: Move) => {
     const { card, x } = (move as { data: UseApprentice }).data
     const name = cardName(t, card)
-    if ([72, 73, 74].includes(card)) return t('button.ignore-action', { card: name })
-    return x === undefined ? name : t('button.apprentice-x', { card: name, x })
+    const label = [72, 73, 74].includes(card) ? t('button.ignore-action', { card: name }) : x === undefined ? name : t('button.apprentice-x', { card: name, x })
+    return <CardPreview card={card}>{label}</CardPreview>
   }
   const resolveLabel = (move: Move) => {
     const data = (move as { data: { split?: number; payWithStudy?: boolean } }).data
