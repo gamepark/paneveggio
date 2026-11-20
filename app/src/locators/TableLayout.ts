@@ -31,6 +31,15 @@ export const masterHeight = (masterWidth * 1407) / 2500
 export const tokenDiameter = 1.3
 /** The token images have a shadow margin: the disc is 150 px in a 204 px image. */
 export const tokenImageSize = (tokenDiameter * 204) / 150
+/**
+ * A violin on a musician is a little smaller than its slot (as on BGA, 20 % of the width of the card): on a musician with
+ * 5 slots, the violins would touch and hide their tokens (Ludo, 20/11/2026). Its Lutherie tokens are small discs in a
+ * row over its bottom edge, so that the colour of each one shows.
+ */
+export const violinOnMusicianScale = 0.8
+export const tokenOnViolinScale = 0.45
+export const tokenOnViolinPitch = 0.6
+export const tokenOnViolinY = 0.65
 
 /** Space between two areas of the table. */
 const gap = 0.5

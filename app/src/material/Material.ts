@@ -48,20 +48,13 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
   help = CharacterCardHelp
 
   /**
-   * The free slots of a musician in play (partner or on the Master Luthier board): the places where a wood can be put
-   * when crafting a violin. The framework only shows the drop areas an item declares.
+   * The slots of a musician in play (partner or on the Master Luthier board): a free slot is where a wood can be put when
+   * crafting (the framework only shows the drop areas an item declares); a slot with a violin has a drawing of it printed
+   * on the card, so that the card shows its violins when it grows under the pointer (MusicianSlotLocator).
    */
   getLocations(item: MaterialItem<PlayerColor, LocationType, number>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     if (item.id === undefined || (item.location.type !== LocationType.PartnerMusicians && item.location.type !== LocationType.MasterMusician)) return []
-    const taken = context.rules
-      .material(MaterialType.ViolinToken)
-      .location(LocationType.MusicianSlot)
-      .parent(context.index)
-      .getItems()
-      .map((violin) => violin.location.id as number)
-    return Array.from({ length: countSlots(item.id) }, (_, slot) => slot)
-      .filter((slot) => !taken.includes(slot))
-      .map((slot) => ({ type: LocationType.MusicianSlot, parent: context.index, id: slot }))
+    return Array.from({ length: countSlots(item.id) }, (_, slot) => ({ type: LocationType.MusicianSlot, parent: context.index, id: slot }))
   }
 
   /**

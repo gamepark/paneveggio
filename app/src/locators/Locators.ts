@@ -1,8 +1,9 @@
+import { css } from '@emotion/react'
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { countSlots } from '@gamepark/paneveggio/material/CharacterCard'
-import { DeckLocator, DropAreaDescription, ItemContext, ListLocator, Locator, MaterialContext, PileLocator } from '@gamepark/react-game'
+import { DeckLocator, DropAreaDescription, ItemContext, ListLocator, LocationDescription, Locator, MaterialContext, PileLocator } from '@gamepark/react-game'
 import { isMoveItemType, Location, MaterialItem, MaterialMove } from '@gamepark/rules-api'
 import {
   ContactsLocator,
@@ -25,7 +26,18 @@ import {
 import { cardHoverTransform } from './CardHover'
 import { bandPosition, helpTokensX } from './MasterBoardLayout'
 import { MasterBandDescription, MasterCostDescription } from './MasterBoardTexts'
-import { cardPitch, deckCenter, masterBoardCenter, masterHeight, tokenDiameter } from './TableLayout'
+import {
+  cardPitch,
+  deckCenter,
+  masterBoardCenter,
+  masterHeight,
+  tokenDiameter,
+  tokenOnViolinPitch,
+  tokenOnViolinScale,
+  tokenOnViolinY,
+  violinOnMusicianScale
+} from './TableLayout'
+import { ViolinDrawing } from './ViolinDrawing'
 
 /**
  * The 4 musicians of the Master Luthier board, on its illustration, each one above its column of the green band
@@ -106,17 +118,28 @@ class MusicianSlotLocator extends Locator<PlayerColor, MaterialType, LocationTyp
     return { x: 84.6, y: 88.65 - (total - 1 - (location.id as number)) * 17.56 }
   }
 
-  /**
-   * A violin on a musician is a little smaller than its slot (as on BGA, 20 % of the width of the card): on a musician
-   * with 5 slots, the violins would touch and hide the Lutherie tokens under each one (Ludo, 20/11/2026). Its tokens,
-   * placed on it, shrink with it.
-   */
+  /** A violin on a musician is drawn smaller than its slot (TableLayout); its tokens, placed on it, shrink with it. */
   placeItem(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     return [...super.placeItem(item, context), `scale(${violinOnMusicianScale})`]
   }
+
+  /** A free slot is a drop area; a slot with a violin has a drawing of it printed on the card (ViolinDrawing). */
+  getLocationDescription(location: Location<PlayerColor, LocationType>, context: MaterialContext<PlayerColor, MaterialType, LocationType>) {
+    const taken = context.rules.material(MaterialType.ViolinToken).location(LocationType.MusicianSlot).parent(location.parent).locationId(location.id).length
+    return taken ? violinDrawingDescription : this.locationDescription
+  }
 }
 
-const violinOnMusicianScale = 0.8
+class ViolinDrawingDescription extends LocationDescription<PlayerColor, MaterialType, LocationType> {
+  width = tokenDiameter
+  height = tokenDiameter
+  extraCss = css`
+    pointer-events: none;
+  `
+  content = ViolinDrawing
+}
+
+const violinDrawingDescription = new ViolinDrawingDescription()
 
 /** Rameau n°23: the token on its note, a little above it. */
 class OnNoteLocator extends Locator<PlayerColor, MaterialType, LocationType> {
@@ -137,20 +160,16 @@ class OnViolinLocator extends Locator<PlayerColor, MaterialType, LocationType> {
     const x = item.location.x ?? 0
     if (onMusician(item, context)) {
       const count = context.rules.material(MaterialType.LutherieToken).location(LocationType.OnViolin).parent(item.location.parent).length
-      return { x: (x - (count - 1) / 2) * onMusicianPitch, y: 0.65, z: 0.1 }
+      return { x: (x - (count - 1) / 2) * tokenOnViolinPitch, y: tokenOnViolinY, z: 0.1 }
     }
     return { y: -0.18 * (x + 1), z: 0.1 * (x + 1) }
   }
 
   placeItem(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     const transform = super.placeItem(item, context)
-    return onMusician(item, context) ? [...transform, `scale(${onMusicianScale})`] : transform
+    return onMusician(item, context) ? [...transform, `scale(${tokenOnViolinScale})`] : transform
   }
 }
-
-/** The Lutherie tokens of a violin on a musician: 0.6 cm discs, 0.6 cm apart, over the bottom edge of the violin. */
-const onMusicianScale = 0.45
-const onMusicianPitch = 0.6
 
 const onMusician = (item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) =>
   context.rules.material(MaterialType.ViolinToken).getItem(item.location.parent!).location.type === LocationType.MusicianSlot
