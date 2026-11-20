@@ -7,6 +7,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { gameAnimations } from './animations/GameAnimations'
 import { App } from './App'
+import { RulesHelp } from './headers/RulesHelp'
 import { Locators } from './locators/Locators'
 import { Material, materialI18n } from './material/Material'
 
@@ -34,6 +35,7 @@ createRoot(document.getElementById('root')!).render(
       locators={Locators}
       animations={gameAnimations}
       theme={theme}
+      rulesHelp={RulesHelp}
     >
       <App />
     </GameProvider>
