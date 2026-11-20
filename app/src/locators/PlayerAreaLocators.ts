@@ -2,11 +2,14 @@ import { getSheetMusicLine } from '@gamepark/paneveggio/material/Action'
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
-import { ItemContext, ListLocator, Locator, MaterialContext, PileLocator } from '@gamepark/react-game'
-import { Location, MaterialItem } from '@gamepark/rules-api'
+import { DropAreaDescription, ItemContext, ListLocator, Locator, MaterialContext, PileLocator } from '@gamepark/react-game'
+import { isMoveItemType, Location, MaterialItem, MaterialMove } from '@gamepark/rules-api'
 import {
   apprenticesY,
   boardCenter,
+  cardHeight,
+  cardRadius,
+  cardWidth,
   cardPitch,
   contactsY,
   contactStep,
@@ -67,9 +70,26 @@ export class FirstPlayerLocator extends Locator<PlayerColor, MaterialType, Locat
 }
 
 /** The 4 piles of Contacts. Their owner sees them in steps (the banner of each card under the top one), the others a pile. */
+/**
+ * A pile of Contacts, where a discard is spread or a card of the hand swapped: dropped there, or put there with a click
+ * once selected (a click on the top card of the pile does the same, see CharacterCardDescription).
+ */
+class ContactPileDescription extends DropAreaDescription<PlayerColor, MaterialType, LocationType> {
+  width = cardWidth
+  height = cardHeight
+  borderRadius = cardRadius
+
+  canShortClick(move: MaterialMove, location: Location<PlayerColor, LocationType>, context: Context) {
+    if (!this.isMoveToLocation(move, location, context) || !isMoveItemType(MaterialType.CharacterCard)(move)) return false
+    const selected = context.rules.material(MaterialType.CharacterCard).selected().getIndexes()
+    return !selected.length || selected.includes(move.itemIndex)
+  }
+}
+
 export class ContactsLocator extends Locator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.PlayerBoard
   getParentItem = playerBoard
+  locationDescription = new ContactPileDescription()
 
   getCoordinates(location: Loc) {
     return { x: contactX(location.id), y: contactsY }

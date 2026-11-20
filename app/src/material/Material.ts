@@ -12,6 +12,7 @@ import { isCustomMoveType, isMoveItemType, MaterialItem, MaterialMove, MaterialM
 import { createElement, Fragment } from 'react'
 import { bandPosition, helpDucatX, helpStudyX } from '../locators/MasterBoardLayout'
 import { BoardOwner } from './BoardOwner'
+import { CardMenu } from './CardMenu'
 import { CharacterCardHelp } from './CharacterCardHelp'
 import { HelpMenu } from './HelpMenu'
 import { NoteMenu, ShiftMenu } from './NoteMenu'
@@ -78,12 +79,25 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
    * The panel of the violins of the card shows while the card is under the pointer: the framework detects the hover on
    * the wrapper of the item, its parent.
    */
-  getItemExtraCss() {
-    return css`
-      *:hover > & .${stacksPanelClass} {
-        display: block;
-      }
-    `
+  getItemExtraCss(item: MaterialItem<PlayerColor, LocationType, number>) {
+    return [
+      css`
+        *:hover > & .${stacksPanelClass} {
+          display: block;
+        }
+      `,
+      item.selected && selectedGlow
+    ]
+  }
+
+  /**
+   * A card with several destinations (a discard to spread on a pile of Contacts, a card of the hand to swap with a
+   * Contact of an opponent): a click selects it (the framework selects an item that has a menu), then a click on a pile
+   * puts it there (Ludo, 20/11/2026).
+   */
+  getItemMenu(_item: MaterialItem<PlayerColor, LocationType, number>, context: ItemContext<PlayerColor, MaterialType, LocationType>, legalMoves: MaterialMove[]) {
+    const moves = legalMoves.filter((move) => isMoveItemType(MaterialType.CharacterCard)(move) && move.itemIndex === context.index)
+    return moves.length > 1 ? createElement(CardMenu) : undefined
   }
 
   /**
@@ -93,11 +107,25 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
    * a click when one move matches. Without a move, a click opens the help of the card.
    */
   canShortClick(move: MaterialMove, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
-    if (isMoveItemType(MaterialType.CharacterCard)(move)) return move.itemIndex === context.index
+    if (isMoveItemType(MaterialType.CharacterCard)(move)) {
+      if (move.itemIndex === context.index) return true
+      // The top card of a pile of Contacts: a click on it puts there the card selected before, or the only card that can go
+      // (the framework plays the click only when one move matches).
+      if (!isOnTopOfPile(move, context)) return false
+      const selected = context.rules.material(MaterialType.CharacterCard).selected().getIndexes()
+      return !selected.length || selected.includes(move.itemIndex)
+    }
     // Relation, Mulligan: a click on the draw pile draws, as the button of the header does (Ludo, 20/11/2026).
     if (isCustomMoveType(CustomMoveType.DrawCards)(move)) return context.rules.material(MaterialType.CharacterCard).getItem(context.index).location.type === LocationType.Deck
     return (isCustomMoveType(CustomMoveType.TakeBack)(move) || isCustomMoveType(CustomMoveType.ChooseCard)(move)) && move.data === context.index
   }
+}
+
+/** Is the card clicked the top card of the pile of Contacts where the move puts a card? */
+const isOnTopOfPile = (move: MaterialMove, context: ItemContext<PlayerColor, MaterialType, LocationType>) => {
+  if (!isMoveItemType(MaterialType.CharacterCard)(move) || move.location.type !== LocationType.Contacts) return false
+  const { location } = context.rules.material(MaterialType.CharacterCard).getItem(context.index)
+  return location.type === LocationType.Contacts && location.player === move.location.player && location.id === move.location.id && location.x === 0
 }
 
 class FrenchCharacterCardDescription extends CharacterCardDescription {
@@ -140,6 +168,11 @@ class PlayerBoardDescription extends BoardDescription<PlayerColor, MaterialType,
 
   isMenuAlwaysVisible() {
     return true
+  }
+
+  /** The 4 piles of Contacts above the board: drop areas for a discard or a swapped card (ContactsLocator). */
+  getLocations(item: MaterialItem<PlayerColor, LocationType>) {
+    return [1, 2, 3, 4].map((id) => ({ type: LocationType.Contacts, player: item.location.player, id }))
   }
 
   /**

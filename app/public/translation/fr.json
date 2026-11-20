@@ -99,6 +99,7 @@
   "help.violin-quality": "Violon de qualité {quality}",
   "help.lutherie-token": "Jeton Lutherie {n}",
   "help.violin-token": "Jeton Violon",
+  "card.choose-pile": "Cliquez sur une pile de Contacts",
   "wood.choose-slot": "Cliquez sur un emplacement libre d’un musicien",
   "help-area.title": "Aide du Maître Luthier",
   "help-area.text": "Vous n’avez plus de ducat ni d’étude ? Le Maître Luthier peut vous aider : placez 1 jeton Lutherie de votre réserve sur sa zone d’aide et recevez 1 ducat ou 1 étude. Attention : ce jeton y reste bloqué jusqu’à la fin de la partie et vous fera perdre 1 PP.",
