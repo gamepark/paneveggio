@@ -21,6 +21,7 @@ export class MasterCostDescription extends LocationDescription<PlayerColor, Mate
   width = cardWidth
   height = cardHeight
   extraCss = notClickable
+  displayInParentItemHelp = true
   content = Cost
 }
 
@@ -28,5 +29,6 @@ export class MasterBandDescription extends LocationDescription<PlayerColor, Mate
   width = masterWidth
   height = bandHeight
   extraCss = notClickable
+  displayInParentItemHelp = true
   content = Band
 }

@@ -16,6 +16,7 @@ import { BoardOwner } from './BoardOwner'
 import { CardMenu } from './CardMenu'
 import { CharacterCardHelp } from './CharacterCardHelp'
 import { HelpMenu } from './HelpMenu'
+import { FirstPlayerCardHelp, LutherieTokenHelp, MasterBoardHelp, NoteTokenHelp, PlayerBoardHelp, StartingCardHelp, ViolinTokenHelp } from './MaterialHelps'
 import { NoteMenu, ShiftMenu } from './NoteMenu'
 import { WoodMenu } from './WoodMenu'
 import {
@@ -135,6 +136,7 @@ class FrenchCharacterCardDescription extends CharacterCardDescription {
 
 /** A starting card (RULES p. 6), for the setup "Players choose". */
 class StartingCardDescription extends CardDescription<PlayerColor, MaterialType, LocationType> {
+  help = StartingCardHelp
   width = cardWidth
   height = cardHeight
   borderRadius = cardRadius
@@ -151,6 +153,7 @@ class FrenchStartingCardDescription extends StartingCardDescription {
 }
 
 class FirstPlayerCardDescription extends CardDescription<PlayerColor, MaterialType, LocationType> {
+  help = FirstPlayerCardHelp
   width = cardWidth
   height = cardHeight
   borderRadius = cardRadius
@@ -159,6 +162,7 @@ class FirstPlayerCardDescription extends CardDescription<PlayerColor, MaterialTy
 
 /** A player board, 29 × 21 cm: one for each player, it never moves. */
 class PlayerBoardDescription extends BoardDescription<PlayerColor, MaterialType, LocationType> {
+  help = PlayerBoardHelp
   width = boardWidth
   height = boardHeight
   image = PlayerBoardEn
@@ -204,6 +208,7 @@ class FrenchPlayerBoardDescription extends PlayerBoardDescription {
 
 /** The Master Luthier board: its illustration without text, at its true proportions (decision of 19/11/2026). */
 class MasterBoardDescription extends BoardDescription<PlayerColor, MaterialType, LocationType> {
+  help = MasterBoardHelp
   width = masterWidth
   height = masterHeight
   image = MasterBoard
@@ -245,6 +250,7 @@ const noteGlow = css`
 `
 
 class NoteTokenDescription extends WoodenTokenDescription<undefined> {
+  help = NoteTokenHelp
   image = Note
 
   /** A click on a note of the player shows its moves (up, down, swap), when the sheet music can change. */
@@ -308,6 +314,7 @@ const isInStock =(context: TokenContext, violin: number) =>
   context.rules.material(MaterialType.ViolinToken).getItem(violin).location.type === LocationType.WoodStock
 
 class ViolinTokenDescription extends WoodenTokenDescription {
+  help = ViolinTokenHelp
   images = violinImages
   /** Shown on the card in the help of a musician, with their Lutherie tokens. */
   displayInParentItemHelp = true
@@ -352,6 +359,7 @@ const selectedGlow = css`
 `
 
 class LutherieTokenDescription extends WoodenTokenDescription {
+  help = LutherieTokenHelp
   images = lutherieImages
   displayInParentItemHelp = true
 
