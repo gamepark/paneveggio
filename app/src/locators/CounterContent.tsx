@@ -7,44 +7,43 @@ import { Location, MaterialRules } from '@gamepark/rules-api'
 
 type Rules = MaterialRules<PlayerColor, MaterialType, LocationType>
 
-/** "×n" on the right of the pile of ducats or studies. */
+/** The number of ducats or studies, inside the token on top of their pile (Ludo, 20/11/2026). Nothing on an empty pile. */
 export const ResourceCount = ({ location }: { location: Location }) => {
   const rules = useRules<Rules>()!
   const count = rules.material(MaterialType.LutherieToken).location(location.type).player(location.player).length
-  return <span css={[badge, resourceBadge]}>×{count}</span>
+  return count ? <TokenNumber value={count} /> : null
 }
 
-/** The quality of a wood: its Violin token and the Lutherie tokens on it (RULES p. 10), under the pile. */
+/**
+ * The quality of a wood: its Violin token and the Lutherie tokens on it (RULES p. 10), inside the token on top of it
+ * (the Lutherie tokens are stacked 0.18 cm higher each, see OnViolinLocator).
+ */
 export const WoodQuality = ({ location }: { location: Location }) => {
   const rules = useRules<Rules>()!
-  const quality = 1 + rules.material(MaterialType.LutherieToken).location(LocationType.OnViolin).parent(location.parent).length
-  return <span css={[badge, woodBadge]}>{quality}</span>
+  const tokens = rules.material(MaterialType.LutherieToken).location(LocationType.OnViolin).parent(location.parent).length
+  return <TokenNumber value={1 + tokens} y={-0.18 * tokens} />
 }
 
-const badge = css`
+/** A number in the middle of the location, above the tokens piled there (in cm, like the location). */
+const TokenNumber = ({ value, y = 0 }: { value: number; y?: number }) => (
+  <div css={[onTop, { transform: `translate3d(-50%, calc(-50% + ${y}em), 1.5em)` }]}>
+    <span css={number}>{value}</span>
+  </div>
+)
+
+const onTop = css`
   position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0.9em;
-  height: 0.9em;
-  padding: 0 0.2em;
-  border-radius: 0.45em;
-  background: rgba(0, 0, 0, 0.75);
-  color: white;
-  font-size: 0.7em;
-  font-weight: bold;
-  white-space: nowrap;
-`
-
-const resourceBadge = css`
-  left: 100%;
-  top: 50%;
-  transform: translate(0.3em, -50%);
-`
-
-const woodBadge = css`
   left: 50%;
-  top: 100%;
-  transform: translate(-50%, 0.1em);
+  top: 50%;
+`
+
+const number = css`
+  display: block;
+  color: white;
+  font-size: 0.75em;
+  font-weight: bold;
+  line-height: 1;
+  text-shadow:
+    0 0 0.15em black,
+    0 0 0.3em black;
 `
