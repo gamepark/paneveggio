@@ -32,7 +32,7 @@
   "header.draw": "{player} pioche une carte",
   "header.draw.you": "Piochez une carte : la pioche, un de vos Contacts, ou échangez une carte de votre main avec un Contact adverse, ou <pass>passez</pass>",
   "header.restoration": "{player} restaure des violons",
-  "header.restoration.you": "Restaurez {count, plural, one {un violon} other {# violons}} (+1 jeton Lutherie chacun), ou <pass>arrêtez</pass>",
+  "header.restoration.you": "Cliquez sur un violon d’un musicien pour le restaurer (+1 jeton Lutherie, {count, plural, one {# restant} other {# restants}}), ou <pass>arrêtez</pass>",
   "header.place-card": "{player} peut poser une carte",
   "header.place-card.you": "Posez une carte de votre main, ou <pass>passez</pass>",
   "header.gain-choice": "{player} choisit entre ducats et études",

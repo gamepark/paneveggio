@@ -150,6 +150,14 @@ class ViolinDrawingDescription extends LocationDescription<PlayerColor, Material
 
 const violinDrawingDescription = new ViolinDrawingDescription()
 
+class OnViolinDropDescription extends DropAreaDescription<PlayerColor, MaterialType, LocationType> {
+  width = tokenDiameter
+  height = tokenDiameter
+  borderRadius = tokenDiameter / 2
+  /** It lies on the violin: a click on it puts the token, as a click on the violin would. */
+  placeOnShortClick = true
+}
+
 class StacksPanelDescription extends LocationDescription<PlayerColor, MaterialType, LocationType> {
   width = cardWidth
   height = cardHeight
@@ -170,6 +178,13 @@ class OnNoteLocator extends Locator<PlayerColor, MaterialType, LocationType> {
 /** A Lutherie token on a Violin token: each one a little higher, so that the pile shows its height. */
 class OnViolinLocator extends Locator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.ViolinToken
+  /** A violin on a musician is a drop area for a token of the reserve (Restoration); a click on the violin works too. */
+  locationDescription = new OnViolinDropDescription()
+
+  getLocations(context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    const violin = context.rules.material(MaterialType.ViolinToken).getItem(context.index)
+    return violin?.location.type === LocationType.MusicianSlot ? [{ type: LocationType.OnViolin, parent: context.index }] : []
+  }
 
   /**
    * A wood of the stock: its Lutherie tokens are piled on it. A violin on a musician: as on BGA, its Lutherie tokens are

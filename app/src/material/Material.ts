@@ -260,13 +260,28 @@ type TokenContext = ItemContext<PlayerColor, MaterialType, LocationType>
 const woodQuality = (context: TokenContext, violin: number) =>
   1 + context.rules.material(MaterialType.LutherieToken).location(LocationType.OnViolin).parent(violin).length
 
-const isInStock = (context: TokenContext, violin: number) =>
+/** A token put on this violin: a Restoration. */
+const isRestoration = (move: MaterialMove, violin: number) =>
+  isMoveItemType(MaterialType.LutherieToken)(move) && move.location.type === LocationType.OnViolin && move.location.parent === violin
+
+const isInStock =(context: TokenContext, violin: number) =>
   context.rules.material(MaterialType.ViolinToken).getItem(violin).location.type === LocationType.WoodStock
 
 class ViolinTokenDescription extends WoodenTokenDescription {
   images = violinImages
   /** Shown on the card in the help of a musician, with their Lutherie tokens. */
   displayInParentItemHelp = true
+
+  /** Restoration (RULES p. 13): a click on a violin puts a token of the reserve on it. */
+  canShortClick(move: MaterialMove, context: TokenContext) {
+    return isRestoration(move, context.index)
+  }
+
+  /** The violins that can be restored now shine. */
+  highlight(_item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
+    if (context.player === undefined || !context.rules.isTurnToPlay(context.player)) return undefined
+    return context.rules.getLegalMoves(context.player).some((move) => isRestoration(move, context.index)) || undefined
+  }
 
   /**
    * A wood without Lutherie token shows its quality, 1. A violin on a musician always shows its quality: its Lutherie
