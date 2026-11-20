@@ -11,6 +11,7 @@ import { CustomMoveType, NoteMove, NoteMoveType, Resource } from '@gamepark/pane
 import { isCustomMoveType, isMoveItemType, MaterialItem, MaterialMove, MaterialMoveBuilder } from '@gamepark/rules-api'
 import { createElement } from 'react'
 import { bandPosition, helpDucatX, helpStudyX } from '../locators/MasterBoardLayout'
+import { CharacterCardHelp } from './CharacterCardHelp'
 import { HelpMenu } from './HelpMenu'
 import { NoteMenu, ShiftMenu } from './NoteMenu'
 import { WoodMenu } from './WoodMenu'
@@ -42,6 +43,8 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
   borderRadius = cardRadius
   images = characterImagesEn
   backImage = CardBack
+  /** The violins on a musician and the piles of their Lutherie tokens (as on BGA). */
+  help = CharacterCardHelp
 
   /**
    * The free slots of a musician in play (partner or on the Master Luthier board): the places where a wood can be put
@@ -235,6 +238,8 @@ const isInStock = (context: TokenContext, violin: number) =>
 
 class ViolinTokenDescription extends WoodenTokenDescription {
   images = violinImages
+  /** Shown on the card in the help of a musician, with their Lutherie tokens. */
+  displayInParentItemHelp = true
 
   /**
    * A wood without Lutherie token shows its quality, 1. A violin on a musician always shows its quality: its Lutherie
@@ -266,6 +271,7 @@ const selectedGlow = css`
 
 class LutherieTokenDescription extends WoodenTokenDescription {
   images = lutherieImages
+  displayInParentItemHelp = true
 
   /** The top token of the ducats or the studies shows their number; the top token of a wood shows its quality. */
   getItemExtraCss(item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
