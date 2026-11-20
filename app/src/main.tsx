@@ -1,3 +1,4 @@
+import { PaneveggioAI } from '@gamepark/paneveggio/ai/PaneveggioAI'
 import { PaneveggioOptionsSpecV2 } from '@gamepark/paneveggio/PaneveggioOptions'
 import { PaneveggioRules } from '@gamepark/paneveggio/PaneveggioRules'
 import { PaneveggioSetup } from '@gamepark/paneveggio/PaneveggioSetup'
@@ -36,6 +37,7 @@ createRoot(document.getElementById('root')!).render(
       animations={gameAnimations}
       theme={theme}
       rulesHelp={RulesHelp}
+      ai={PaneveggioAI}
     >
       <App />
     </GameProvider>
