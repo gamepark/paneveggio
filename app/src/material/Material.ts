@@ -1,5 +1,6 @@
 import { css, keyframes } from '@emotion/react'
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
+import { BEATS } from '@gamepark/paneveggio/logic/SheetMusic'
 import { countSlots } from '@gamepark/paneveggio/material/CharacterCard'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { Memory } from '@gamepark/paneveggio/material/Memory'
@@ -248,10 +249,14 @@ class NoteTokenDescription extends WoodenTokenDescription<undefined> {
 
   /** A click on a note of the player shows its moves (up, down, swap), when the sheet music can change. */
   getItemMenu(item: MaterialItem<PlayerColor, LocationType>, _context: ItemContext<PlayerColor, MaterialType, LocationType>, legalMoves: MaterialMove[]) {
+    if (item.location.type !== LocationType.SheetMusic) return undefined
+    const beat = item.location.x!
+    // Its moves, and the swap with the note before it, which is the swap of that note with the next one.
+    const previous = (beat + BEATS - 1) % BEATS
     const moves = legalMoves
       .filter(isCustomMoveType<CustomMoveType, NoteMove>(CustomMoveType.MoveNote))
-      .filter((move) => move.data?.beat === item.location.x && item.location.type === LocationType.SheetMusic)
-    return moves.length ? createElement(NoteMenu, { moves }) : undefined
+      .filter((move) => move.data?.beat === beat || (move.data?.type === NoteMoveType.Swap && move.data.beat === previous))
+    return moves.length ? createElement(NoteMenu, { beat, moves }) : undefined
   }
 
   /** The notes of the action being played shine, so that everyone sees where the turn is on the sheet music. */
