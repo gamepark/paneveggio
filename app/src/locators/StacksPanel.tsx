@@ -23,7 +23,7 @@ const panel = css`
   border-radius: 0.2em;
   background: #f0fbfc;
   color: #002448;
-  font-size: 0.27em;
+  font-size: 0.38em;
   white-space: nowrap;
   box-shadow: 0 0 0.3em rgba(0, 0, 0, 0.5);
   pointer-events: none;
