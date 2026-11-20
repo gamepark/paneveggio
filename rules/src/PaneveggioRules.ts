@@ -4,7 +4,6 @@ import {
   hideItemIdToOthers,
   isMoveItemType,
   MaterialGame,
-  MaterialItem,
   MaterialMove,
   PositiveSequenceStrategy,
   SecretMaterialRules,
@@ -49,12 +48,6 @@ import { ValorizeRule } from './rules/ValorizeRule'
 
 type Game = MaterialGame<PlayerColor, MaterialType, LocationType, RuleId>
 type Move = MaterialMove<PlayerColor, MaterialType, LocationType, RuleId>
-
-/**
- * Contacts (decision D8): the top card of each pile (x = 0) is seen by everyone, the cards under it only by their owner.
- */
-const hideContactsUnderTheTop = (item: MaterialItem<PlayerColor, LocationType>, player?: PlayerColor) =>
-  item.location.player === player || item.location.x === 0 ? [] : ['id']
 
 /**
  * This class implements the rules of the board game.
@@ -129,8 +122,10 @@ export class PaneveggioRules
     [MaterialType.CharacterCard]: {
       [LocationType.Deck]: hideItemId,
       [LocationType.PlayerHand]: hideItemIdToOthers,
-      [LocationType.DraftPacket]: hideItemIdToOthers,
-      [LocationType.Contacts]: hideContactsUnderTheTop
+      [LocationType.DraftPacket]: hideItemIdToOthers
+      // The Contacts are not hidden: every card reaches them face up (drawn, or discarded during a turn), so everyone has
+      // seen them. Hiding the cards under the top one broke the views (20/11/2026): when a card covers another one, the
+      // framework cannot hide again the one that is covered. Only the owner sees them in steps (decision D8, app).
     }
   }
 

@@ -57,7 +57,9 @@ export abstract class PaneveggioTurnRule extends PlayerTurnRule<PlayerColor, Mat
    * sheet music shows, within 6 apprentices trained during the game (RULES p. 16 and 17)?
    * Chapel Master n°21 ignores the prerequisites of the apprentice (RULES p. 20).
    */
-  canPlace(card: number, player = this.player, ignorePrerequisites = false) {
+  canPlace(card: number | undefined, player = this.player, ignorePrerequisites = false) {
+    // A card of another player, hidden in a browser: never offered there.
+    if (card === undefined) return false
     if (isApprentice(card)) {
       return this.apprenticesTrained(player) < MAX_APPRENTICES && (ignorePrerequisites || this.sheetMusic(player).hasPattern(apprentices[card].pattern))
     }
@@ -125,9 +127,14 @@ export abstract class TaskRule extends PaneveggioTurnRule {
     this.memorize<Task[]>(Memory.Tasks, (tasks) => [{ ...tasks[0], ...changes }, ...tasks.slice(1)])
   }
 
+  /**
+   * A step without choice is passed with a move rather than by going to the next task at once: the choices can depend on
+   * cards a browser does not see (the hand of another player), and the browser must not change the queue of the turn on
+   * its own. The "pass" move comes from the server, and every browser plays it (view consistency, 20/11/2026).
+   */
   onRuleStart(): Move[] {
     const choices = this.getChoices()
-    if (!choices.length) return this.next()
+    if (!choices.length) return [this.customMove(CustomMoveType.Pass)]
     if (choices.length === 1 && (this.task.mandatory || this.autoSingle)) return [choices[0]]
     return []
   }

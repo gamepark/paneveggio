@@ -70,10 +70,11 @@ describe('Setup with the starting decks', () => {
     expect(rules.material(MaterialType.FirstPlayerCard).getItem()?.location).toEqual({ type: LocationType.FirstPlayer, player: rules.players[0] })
   })
 
-  it('hides the hands from the others, the draw pile from everyone, and the Contacts under the top from the others', () => {
+  it('hides the hands from the others and the draw pile from everyone, never the Contacts', () => {
     const rules = setup(2)
     const [me, other] = rules.players
-    // A second card on a pile of the other player, to check what is under the top card.
+    // A second card on a pile of the other player: the cards under the top one are seen too (every card reached the
+    // Contacts face up; hiding them broke the views of the players, see PaneveggioView.spec).
     rules.play(rules.material(MaterialType.CharacterCard).location(LocationType.Deck).deck().dealOne({ type: LocationType.Contacts, player: other, id: 1, x: 0 }))
     const view = new PaneveggioRules(rules.getPlayerView(me))
     const cards = view.material(MaterialType.CharacterCard)
@@ -81,8 +82,8 @@ describe('Setup with the starting decks', () => {
     expect(cards.location(LocationType.PlayerHand).player(other).getItems().every((card) => card.id === undefined)).toBe(true)
     expect(cards.location(LocationType.Deck).getItems().every((card) => card.id === undefined)).toBe(true)
     const pile = cards.location(LocationType.Contacts).player(other).locationId(1).getItems()
-    expect(pile.map((card) => [card.location.x, card.id !== undefined])).toEqual(expect.arrayContaining([[0, true], [1, false]]))
-    expect(new PaneveggioRules(rules.getPlayerView(other)).material(MaterialType.CharacterCard).location(LocationType.Contacts).player(other).getItems().every((card) => card.id !== undefined)).toBe(true)
+    expect(pile).toHaveLength(2)
+    expect(pile.every((card) => card.id !== undefined)).toBe(true)
   })
 
   it('places each note on the line of its action', () => {
