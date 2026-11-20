@@ -59,5 +59,11 @@ export const cardHoverTransform = (item: Item, context: ItemCtx): string[] => {
   const table = tableBoundaries(context.rules, context.player)
   const dx = pushInside(x, (cardWidth * hoverScale) / 2, table.xMin, table.xMax)
   const dy = pushInside(y, (cardHeight * hoverScale) / 2, table.yMin, table.yMax)
-  return [`translate3d(${dx / scale}em, ${dy / scale}em, ${10 / scale}em)`, `scale(${hoverScale / scale})`]
+  return [`translate3d(${dx / scale}em, ${dy / scale}em, ${hoverHeight / scale}em)`, `scale(${hoverScale / scale})`]
 }
+
+/**
+ * How high a hovered card rises above the table: above the item menus too (the help buttons of the Master Luthier, the
+ * shifts of the sheet music…), that the framework raises about 15 cm.
+ */
+const hoverHeight = 20
