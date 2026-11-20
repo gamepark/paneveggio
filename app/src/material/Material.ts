@@ -183,12 +183,64 @@ class NoteTokenDescription extends WoodenTokenDescription<undefined> {
   }
 }
 
+/**
+ * A number written inside a token (Ludo, 20/11/2026): the size of the pile of ducats or studies, the quality of a wood.
+ * It is written on the token on top of the pile only, so it moves with the pile and nothing hides it.
+ */
+const tokenNumber = (value: number) => css`
+  &::after {
+    content: '${value}';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-shadow:
+      0 0 0.1em black,
+      0 0 0.25em black;
+    pointer-events: none;
+  }
+`
+
+type TokenContext = ItemContext<PlayerColor, MaterialType, LocationType>
+
+/** The quality of a wood of the stock: its Violin token and the Lutherie tokens on it (RULES p. 10). */
+const woodQuality = (context: TokenContext, violin: number) =>
+  1 + context.rules.material(MaterialType.LutherieToken).location(LocationType.OnViolin).parent(violin).length
+
+const isInStock = (context: TokenContext, violin: number) =>
+  context.rules.material(MaterialType.ViolinToken).getItem(violin).location.type === LocationType.WoodStock
+
 class ViolinTokenDescription extends WoodenTokenDescription {
   images = violinImages
+
+  /** A wood without Lutherie token shows its quality, 1. */
+  getItemExtraCss(item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
+    if (item.location.type !== LocationType.WoodStock || woodQuality(context, context.index) > 1) return undefined
+    return tokenNumber(1)
+  }
 }
 
 class LutherieTokenDescription extends WoodenTokenDescription {
   images = lutherieImages
+
+  /** The top token of the ducats or the studies shows their number; the top token of a wood shows its quality. */
+  getItemExtraCss(item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
+    const { type, player, parent, x } = item.location
+    const tokens = context.rules.material(MaterialType.LutherieToken)
+    if (type === LocationType.Ducats || type === LocationType.Studies) {
+      const pile = tokens.location(type).player(player).getIndexes()
+      return context.index === Math.max(...pile) ? tokenNumber(pile.length) : undefined
+    }
+    if (type === LocationType.OnViolin && isInStock(context, parent!)) {
+      const quality = woodQuality(context, parent!)
+      return x === quality - 2 ? tokenNumber(quality) : undefined
+    }
+    return undefined
+  }
 }
 
 export const Material: Partial<Record<MaterialType, MaterialDescription>> = {

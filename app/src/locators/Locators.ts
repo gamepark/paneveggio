@@ -2,7 +2,7 @@ import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { countSlots } from '@gamepark/paneveggio/material/CharacterCard'
-import { DeckLocator, ItemContext, ListLocator, Locator, MaterialContext, PileLocator } from '@gamepark/react-game'
+import { DeckLocator, ItemContext, ListLocator, Locator, PileLocator } from '@gamepark/react-game'
 import { Location, MaterialItem } from '@gamepark/rules-api'
 import {
   ContactsLocator,
@@ -23,7 +23,6 @@ import {
   WoodStockLocator
 } from './PlayerAreaLocators'
 import { cardHoverTransform } from './CardHover'
-import { WoodQualityDescription } from './Counters'
 import { bandPosition, helpTokensX } from './MasterBoardLayout'
 import { MasterBandDescription, MasterCostDescription } from './MasterBoardTexts'
 import { cardPitch, deckCenter, masterBoardCenter, masterHeight } from './TableLayout'
@@ -86,16 +85,6 @@ class OnNoteLocator extends Locator<PlayerColor, MaterialType, LocationType> {
 /** A Lutherie token on a Violin token: each one a little higher, so that the pile shows its height. */
 class OnViolinLocator extends Locator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.ViolinToken
-  /** The quality of each wood of the stocks is written under it (Ludo, 20/11/2026). */
-  locationDescription = new WoodQualityDescription()
-
-  getLocations(context: MaterialContext<PlayerColor, MaterialType, LocationType>) {
-    return context.rules
-      .material(MaterialType.ViolinToken)
-      .location(LocationType.WoodStock)
-      .getIndexes()
-      .map((parent) => ({ type: LocationType.OnViolin, parent }))
-  }
 
   getItemCoordinates(item: MaterialItem<PlayerColor, LocationType>, _context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     const height = (item.location.x ?? 0) + 1
