@@ -13,6 +13,7 @@ import { createElement } from 'react'
 import { bandPosition, helpDucatX, helpStudyX } from '../locators/MasterBoardLayout'
 import { HelpMenu } from './HelpMenu'
 import { NoteMenu, ShiftMenu } from './NoteMenu'
+import { WoodMenu } from './WoodMenu'
 import {
   CardBack,
   characterImagesEn,
@@ -235,12 +236,33 @@ const isInStock = (context: TokenContext, violin: number) =>
 class ViolinTokenDescription extends WoodenTokenDescription {
   images = violinImages
 
-  /** A wood without Lutherie token shows its quality, 1. */
+  /**
+   * A wood without Lutherie token shows its quality, 1. A violin on a musician always shows its quality: its Lutherie
+   * tokens are small discs under it (OnViolinLocator), as on BGA. A selected wood shines.
+   */
   getItemExtraCss(item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
-    if (item.location.type !== LocationType.WoodStock || woodQuality(context, context.index) > 1) return undefined
-    return tokenNumber(1)
+    const quality = woodQuality(context, context.index)
+    const number =
+      (item.location.type === LocationType.WoodStock && quality === 1) || item.location.type === LocationType.MusicianSlot ? tokenNumber(quality) : undefined
+    return [number, item.selected && selectedGlow]
+  }
+
+  /**
+   * During a Crafting with several woods that can go, a click on a wood selects it (the framework selects an item that
+   * has a menu); then a click on a free slot sends it there (MusicianSlotDescription).
+   */
+  getItemMenu(item: MaterialItem<PlayerColor, LocationType>, context: TokenContext, legalMoves: MaterialMove[]) {
+    if (item.location.type !== LocationType.WoodStock) return undefined
+    const woods = new Set(
+      legalMoves.filter((move) => isMoveItemType(MaterialType.ViolinToken)(move) && move.location.type === LocationType.MusicianSlot).map((move) => (move as { itemIndex: number }).itemIndex)
+    )
+    return woods.size > 1 && woods.has(context.index) ? createElement(WoodMenu) : undefined
   }
 }
+
+const selectedGlow = css`
+  filter: drop-shadow(0 0 0.15em #ffd84a) drop-shadow(0 0 0.15em #ffd84a);
+`
 
 class LutherieTokenDescription extends WoodenTokenDescription {
   images = lutherieImages
@@ -253,13 +275,27 @@ class LutherieTokenDescription extends WoodenTokenDescription {
       const pile = tokens.location(type).player(player).getIndexes()
       return context.index === Math.max(...pile) ? tokenNumber(pile.length) : undefined
     }
-    if (type === LocationType.OnViolin && isInStock(context, parent!)) {
+    if (type === LocationType.OnViolin) {
       const quality = woodQuality(context, parent!)
-      return x === quality - 2 ? tokenNumber(quality) : undefined
+      const number = isInStock(context, parent!) && x === quality - 2 ? tokenNumber(quality) : undefined
+      return [number, !canMove(context) && clickThrough]
     }
     return undefined
   }
 }
+
+/**
+ * A Lutherie token on a wood or a violin lets the clicks through to its Violin token (to choose the wood to craft with,
+ * to drag it), unless it can be moved itself (taken back when the player lacks tokens, RULES p. 7).
+ */
+const canMove = (context: TokenContext) =>
+  context.player !== undefined &&
+  context.rules.isTurnToPlay(context.player) &&
+  context.rules.getLegalMoves(context.player).some((move) => isMoveItemType(MaterialType.LutherieToken)(move) && move.itemIndex === context.index)
+
+const clickThrough = css`
+  pointer-events: none;
+`
 
 export const Material: Partial<Record<MaterialType, MaterialDescription>> = {
   [MaterialType.MasterBoard]: new MasterBoardDescription(),

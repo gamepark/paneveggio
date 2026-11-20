@@ -95,6 +95,7 @@
   "note.up": "Monter la note",
   "note.down": "Descendre la note",
   "note.swap": "Échanger avec la suivante",
+  "wood.choose-slot": "Cliquez sur un emplacement libre d’un musicien",
   "help-area.title": "Aide du Maître Luthier",
   "help-area.text": "Vous n’avez plus de ducat ni d’étude ? Le Maître Luthier peut vous aider : placez 1 jeton Lutherie de votre réserve sur sa zone d’aide et recevez 1 ducat ou 1 étude. Attention : ce jeton y reste bloqué jusqu’à la fin de la partie et vous fera perdre 1 PP.",
   "help-area.ducat": "Recevoir 1 ducat",

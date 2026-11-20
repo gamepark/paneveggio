@@ -2,8 +2,8 @@ import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { countSlots } from '@gamepark/paneveggio/material/CharacterCard'
-import { DeckLocator, DropAreaDescription, ItemContext, ListLocator, Locator, PileLocator } from '@gamepark/react-game'
-import { Location, MaterialItem } from '@gamepark/rules-api'
+import { DeckLocator, DropAreaDescription, ItemContext, ListLocator, Locator, MaterialContext, PileLocator } from '@gamepark/react-game'
+import { isMoveItemType, Location, MaterialItem, MaterialMove } from '@gamepark/rules-api'
 import {
   ContactsLocator,
   DraftPacketLocator,
@@ -75,7 +75,16 @@ class MusicianSlotDescription extends DropAreaDescription<PlayerColor, MaterialT
   width = tokenDiameter
   height = tokenDiameter
   borderRadius = tokenDiameter / 2
-  placeOnShortClick = true
+
+  /**
+   * A click on the slot puts the wood there: the only wood that can go, or the wood selected with a click on it (the
+   * player chooses which wood they send, Ludo 20/11/2026). The framework plays the click only when one move matches.
+   */
+  canShortClick(move: MaterialMove, location: Location<PlayerColor, LocationType>, context: MaterialContext<PlayerColor, MaterialType, LocationType>) {
+    if (!this.isMoveToLocation(move, location, context) || !isMoveItemType(MaterialType.ViolinToken)(move)) return false
+    const selected = context.rules.material(MaterialType.ViolinToken).selected().getIndexes()
+    return !selected.length || selected.includes(move.itemIndex)
+  }
 }
 
 class MusicianSlotLocator extends Locator<PlayerColor, MaterialType, LocationType> {
@@ -98,11 +107,32 @@ class OnNoteLocator extends Locator<PlayerColor, MaterialType, LocationType> {
 class OnViolinLocator extends Locator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.ViolinToken
 
-  getItemCoordinates(item: MaterialItem<PlayerColor, LocationType>, _context: ItemContext<PlayerColor, MaterialType, LocationType>) {
-    const height = (item.location.x ?? 0) + 1
-    return { y: -0.18 * height, z: 0.1 * height }
+  /**
+   * A wood of the stock: its Lutherie tokens are piled on it. A violin on a musician: as on BGA, its Lutherie tokens are
+   * small discs in a row under it, in their order of arrival, so that the colour of each one can be seen (Ludo,
+   * 20/11/2026); the violin shows its quality (ViolinTokenDescription).
+   */
+  getItemCoordinates(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    const x = item.location.x ?? 0
+    if (onMusician(item, context)) {
+      const count = context.rules.material(MaterialType.LutherieToken).location(LocationType.OnViolin).parent(item.location.parent).length
+      return { x: (x - (count - 1) / 2) * onMusicianPitch, y: 0.65, z: 0.1 }
+    }
+    return { y: -0.18 * (x + 1), z: 0.1 * (x + 1) }
+  }
+
+  placeItem(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    const transform = super.placeItem(item, context)
+    return onMusician(item, context) ? [...transform, `scale(${onMusicianScale})`] : transform
   }
 }
+
+/** The Lutherie tokens of a violin on a musician: 0.6 cm discs, 0.6 cm apart, over the bottom edge of the violin. */
+const onMusicianScale = 0.45
+const onMusicianPitch = 0.6
+
+const onMusician = (item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) =>
+  context.rules.material(MaterialType.ViolinToken).getItem(item.location.parent!).location.type === LocationType.MusicianSlot
 
 export const Locators: Partial<Record<LocationType, Locator<PlayerColor, MaterialType, LocationType>>> = {
   [LocationType.MasterBoard]: new Locator({ coordinates: masterBoardCenter }),
