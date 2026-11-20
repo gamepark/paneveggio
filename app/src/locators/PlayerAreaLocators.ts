@@ -25,6 +25,7 @@ import {
   seatScale
 } from './TableLayout'
 import { cardHoverTransform } from './CardHover'
+import { ResourceCountDescription } from './Counters'
 
 type Context = MaterialContext<PlayerColor, MaterialType, LocationType>
 type ItemCtx = ItemContext<PlayerColor, MaterialType, LocationType>
@@ -203,13 +204,27 @@ export class SheetMusicLocator extends Locator<PlayerColor, MaterialType, Locati
 }
 
 /** Ducats and Studies areas, in the frame under the sheet music. */
+/**
+ * The ducats or the studies of each player: a tidy pile, with their number next to it (Ludo, 20/11/2026: spreading
+ * the tokens tells nothing, a counter does).
+ */
 class BoardAreaLocator extends PileLocator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.PlayerBoard
   getParentItem = playerBoard
+  radius = 0.15
+  locationDescription = new ResourceCountDescription()
+
+  constructor(private readonly type: LocationType, clone: Partial<PileLocator>) {
+    super(clone)
+  }
+
+  getLocations(context: MaterialContext<PlayerColor, MaterialType, LocationType>) {
+    return context.rules.players.map((player) => ({ type: this.type, player }))
+  }
 }
 
-export const ducatsLocator = new BoardAreaLocator({ positionOnParent: { x: 17.8, y: 59.7 }, radius: { x: 1.6, y: 0.25 } })
-export const studiesLocator = new BoardAreaLocator({ positionOnParent: { x: 72.5, y: 59.7 }, radius: { x: 2, y: 0.25 } })
+export const ducatsLocator = new BoardAreaLocator(LocationType.Ducats, { positionOnParent: { x: 17.8, y: 59.7 } })
+export const studiesLocator = new BoardAreaLocator(LocationType.Studies, { positionOnParent: { x: 72.5, y: 59.7 } })
 
 /** The wood stock: one pile per wood, from the left of its frame. */
 export class WoodStockLocator extends ListLocator<PlayerColor, MaterialType, LocationType> {
