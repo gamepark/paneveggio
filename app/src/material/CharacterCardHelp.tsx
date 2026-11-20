@@ -73,18 +73,19 @@ const Row = ({ image, player, label }: { image: string; player: PlayerColor; lab
 }
 
 const help = css`
-  font-size: 2em;
-  min-width: 16em;
+  font-size: 1.4em;
+  min-width: 24em;
   h3 {
     font-size: 1.2em;
     margin: 0 0 0.5em;
   }
 `
 
+/** Up to 5 violins (Ludo, 20/11/2026: the texts were too big): the piles side by side, 2 per line. */
 const stacks = css`
-  display: flex;
-  flex-direction: column;
-  gap: 0.8em;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 1em 2em;
 `
 
 const stack = css`
@@ -99,6 +100,6 @@ const row = css`
   gap: 0.5em;
   margin-top: -0.4em;
   img {
-    width: 2em;
+    width: 1.8em;
   }
 `

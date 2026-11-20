@@ -95,7 +95,18 @@ class MusicianSlotLocator extends Locator<PlayerColor, MaterialType, LocationTyp
     const total = countSlots(context.rules.material(MaterialType.CharacterCard).getItem<number>(location.parent!).id)
     return { x: 84.6, y: 88.65 - (total - 1 - (location.id as number)) * 17.56 }
   }
+
+  /**
+   * A violin on a musician is a little smaller than its slot (as on BGA, 20 % of the width of the card): on a musician
+   * with 5 slots, the violins would touch and hide the Lutherie tokens under each one (Ludo, 20/11/2026). Its tokens,
+   * placed on it, shrink with it.
+   */
+  placeItem(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    return [...super.placeItem(item, context), `scale(${violinOnMusicianScale})`]
+  }
 }
+
+const violinOnMusicianScale = 0.8
 
 /** Rameau n°23: the token on its note, a little above it. */
 class OnNoteLocator extends Locator<PlayerColor, MaterialType, LocationType> {
