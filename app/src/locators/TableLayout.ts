@@ -40,7 +40,7 @@ export const cardPitch = cardWidth + cardGap
 /** The areas of the other players are shown smaller. */
 export const opponentScale = 0.4
 /** Room always kept for this many partner musicians and apprentices, so that the table does not move at each card placed. */
-const reservedPartners = 4
+const reservedPartners = 3
 const margin = 0.5
 
 // ------------------------------------------------------------------ inside a player area: cm from the centre of the board, full size
@@ -120,10 +120,10 @@ export const seatScale = (seat: number) => (seat === 0 ? 1 : opponentScale)
 
 // ------------------------------------------------------------------ shared area
 
-/** The Master Luthier board, above the partner musicians of the viewer. */
+/** The Master Luthier board, just above the partner musicians of the viewer (option 1 of Ludo, 20/11/2026: the table is shorter). */
 export const masterBoardCenter: XYCoordinates = {
   x: partnersX - cardWidth / 2 + masterWidth / 2,
-  y: -boardHeight / 2 - gap - masterHeight / 2
+  y: musiciansY - cardHeight / 2 - gap - masterHeight / 2
 }
 const masterTop = masterBoardCenter.y - masterHeight / 2
 
