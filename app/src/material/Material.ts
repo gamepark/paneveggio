@@ -9,8 +9,9 @@ import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { BoardDescription, CardDescription, ItemContext, MaterialContext, MaterialDescription, SoundKit, TokenDescription } from '@gamepark/react-game'
 import { CustomMoveType, NoteMove, NoteMoveType, Resource } from '@gamepark/paneveggio/material/CustomMoveType'
 import { isCustomMoveType, isMoveItemType, MaterialItem, MaterialMove, MaterialMoveBuilder } from '@gamepark/rules-api'
-import { createElement } from 'react'
+import { createElement, Fragment } from 'react'
 import { bandPosition, helpDucatX, helpStudyX } from '../locators/MasterBoardLayout'
+import { BoardOwner } from './BoardOwner'
 import { CharacterCardHelp } from './CharacterCardHelp'
 import { HelpMenu } from './HelpMenu'
 import { NoteMenu, ShiftMenu } from './NoteMenu'
@@ -117,14 +118,18 @@ class PlayerBoardDescription extends BoardDescription<PlayerColor, MaterialType,
     return true
   }
 
-  /** The shifts of the whole sheet music (RULES p. 9), on each side of the staff of the player. */
+  /**
+   * The name of the owner on every board, to know at once whose board is shown large (Ludo, 20/11/2026); on the board of
+   * the player, the shifts of the whole sheet music (RULES p. 9), on each side of the staff.
+   */
   getItemMenu(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>, legalMoves: MaterialMove[]) {
-    if (item.location.player !== context.player) return undefined
+    const player = item.location.player!
+    const name = createElement(BoardOwner, { player, large: player === getDisplayedPlayer(context.rules, context.player) })
+    if (player !== context.player) return name
     const moves = legalMoves.filter(isCustomMoveType<CustomMoveType, NoteMove>(CustomMoveType.MoveNote))
     const left = moves.find((move) => move.data?.type === NoteMoveType.ShiftLeft)
     const right = moves.find((move) => move.data?.type === NoteMoveType.ShiftRight)
-    if (!left && !right) return undefined
-    return createElement(ShiftMenu, { left, right })
+    return createElement(Fragment, null, name, (left || right) && createElement(ShiftMenu, { left, right }))
   }
 
   /** A click on a small board displays that player area large (decision of 19/11/2026); on the large one, its help. */
@@ -277,8 +282,8 @@ class LutherieTokenDescription extends WoodenTokenDescription {
   getItemExtraCss(item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
     const { type, player, parent, x } = item.location
     const tokens = context.rules.material(MaterialType.LutherieToken)
-    if (type === LocationType.Ducats || type === LocationType.Studies) {
-      const pile = tokens.location(type).player(player).getIndexes()
+    if (type === LocationType.Ducats || type === LocationType.Studies || type === LocationType.HelpArea) {
+      const pile = (type === LocationType.HelpArea ? tokens.location(type).id(item.id) : tokens.location(type).player(player)).getIndexes()
       return context.index === Math.max(...pile) ? tokenNumber(pile.length) : undefined
     }
     if (type === LocationType.OnViolin) {

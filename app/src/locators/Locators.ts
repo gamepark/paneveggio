@@ -54,14 +54,24 @@ class MasterMusicianLocator extends Locator<PlayerColor, MaterialType, LocationT
 class HelpAreaLocator extends PileLocator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.MasterBoard
   positionOnParent = bandPosition
-  radius = { x: 1.6, y: 0.5 }
+  radius = 0.12
+  maxAngle = 0
   locationDescription = new MasterBandDescription()
+
+  /** One tidy pile per player, its number written on the top token, as the ducats and studies (Ludo, 20/11/2026). */
+  getPileId(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    return `${super.getPileId(item, context)}-${item.id}`
+  }
 
   getItemCoordinates(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     const { x = 0, y = 0, z = 0 } = super.getItemCoordinates(item, context)
-    return { x: x + helpTokensX, y, z }
+    const players = context.rules.players
+    const seat = players.indexOf(item.id as PlayerColor)
+    return { x: x + helpTokensX + (seat - (players.length - 1) / 2) * helpPilePitch, y, z }
   }
 }
+
+const helpPilePitch = 1.6
 
 /**
  * A violin on a musician card, on the circle of its slot: the slots are on the right edge of the card, the last one

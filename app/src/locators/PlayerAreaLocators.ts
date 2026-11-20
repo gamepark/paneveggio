@@ -211,6 +211,8 @@ class BoardAreaLocator extends PileLocator<PlayerColor, MaterialType, LocationTy
   parentItemType = MaterialType.PlayerBoard
   getParentItem = playerBoard
   radius = 0.15
+  /** Not turned: the number written on the top token stays straight. */
+  maxAngle = 0
 }
 
 export const ducatsLocator = new BoardAreaLocator({ positionOnParent: { x: 17.8, y: 59.7 } })
