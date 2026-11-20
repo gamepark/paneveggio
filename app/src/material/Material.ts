@@ -1,5 +1,6 @@
 import { css, keyframes } from '@emotion/react'
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
+import { countSlots } from '@gamepark/paneveggio/material/CharacterCard'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { Memory } from '@gamepark/paneveggio/material/Memory'
 import { RuleId } from '@gamepark/paneveggio/rules/RuleId'
@@ -40,6 +41,23 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
   borderRadius = cardRadius
   images = characterImagesEn
   backImage = CardBack
+
+  /**
+   * The free slots of a musician in play (partner or on the Master Luthier board): the places where a wood can be put
+   * when crafting a violin. The framework only shows the drop areas an item declares.
+   */
+  getLocations(item: MaterialItem<PlayerColor, LocationType, number>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    if (item.id === undefined || (item.location.type !== LocationType.PartnerMusicians && item.location.type !== LocationType.MasterMusician)) return []
+    const taken = context.rules
+      .material(MaterialType.ViolinToken)
+      .location(LocationType.MusicianSlot)
+      .parent(context.index)
+      .getItems()
+      .map((violin) => violin.location.id as number)
+    return Array.from({ length: countSlots(item.id) }, (_, slot) => slot)
+      .filter((slot) => !taken.includes(slot))
+      .map((slot) => ({ type: LocationType.MusicianSlot, parent: context.index, id: slot }))
+  }
 
   /**
    * A click on a card plays its move when it has only one (Ludo, 19/11/2026: "il faudrait simplement cliquer dessus et

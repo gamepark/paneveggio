@@ -2,7 +2,7 @@ import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { countSlots } from '@gamepark/paneveggio/material/CharacterCard'
-import { DeckLocator, ItemContext, ListLocator, Locator, PileLocator } from '@gamepark/react-game'
+import { DeckLocator, DropAreaDescription, ItemContext, ListLocator, Locator, PileLocator } from '@gamepark/react-game'
 import { Location, MaterialItem } from '@gamepark/rules-api'
 import {
   ContactsLocator,
@@ -25,7 +25,7 @@ import {
 import { cardHoverTransform } from './CardHover'
 import { bandPosition, helpTokensX } from './MasterBoardLayout'
 import { MasterBandDescription, MasterCostDescription } from './MasterBoardTexts'
-import { cardPitch, deckCenter, masterBoardCenter, masterHeight } from './TableLayout'
+import { cardPitch, deckCenter, masterBoardCenter, masterHeight, tokenDiameter } from './TableLayout'
 
 /**
  * The 4 musicians of the Master Luthier board, on its illustration, each one above its column of the green band
@@ -67,8 +67,20 @@ class HelpAreaLocator extends PileLocator<PlayerColor, MaterialType, LocationTyp
  * A violin on a musician card, on the circle of its slot: the slots are on the right edge of the card, the last one
  * centred at 88.65 % of its height, then every 17.56 % upwards (BGA measures, Game.slotTop).
  */
+/**
+ * A free slot where a wood can be placed (Crafting): a round drop area. With a single wood in stock, a click on the slot
+ * is enough; with several, the wood is dragged onto it.
+ */
+class MusicianSlotDescription extends DropAreaDescription<PlayerColor, MaterialType, LocationType> {
+  width = tokenDiameter
+  height = tokenDiameter
+  borderRadius = tokenDiameter / 2
+  placeOnShortClick = true
+}
+
 class MusicianSlotLocator extends Locator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.CharacterCard
+  locationDescription = new MusicianSlotDescription()
 
   getPositionOnParent(location: Location<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     const total = countSlots(context.rules.material(MaterialType.CharacterCard).getItem<number>(location.parent!).id)
