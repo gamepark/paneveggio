@@ -94,6 +94,8 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
    */
   canShortClick(move: MaterialMove, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     if (isMoveItemType(MaterialType.CharacterCard)(move)) return move.itemIndex === context.index
+    // Relation, Mulligan: a click on the draw pile draws, as the button of the header does (Ludo, 20/11/2026).
+    if (isCustomMoveType(CustomMoveType.DrawCards)(move)) return context.rules.material(MaterialType.CharacterCard).getItem(context.index).location.type === LocationType.Deck
     return (isCustomMoveType(CustomMoveType.TakeBack)(move) || isCustomMoveType(CustomMoveType.ChooseCard)(move)) && move.data === context.index
   }
 }
