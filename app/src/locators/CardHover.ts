@@ -2,7 +2,7 @@ import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { ItemContext } from '@gamepark/react-game'
-import { MaterialItem } from '@gamepark/rules-api'
+import { isMoveItemType, MaterialItem } from '@gamepark/rules-api'
 import { boardCenter, boardHeight, boardWidth, cardHeight, cardWidth, getSeat, masterBoardCenter, masterHeight, masterWidth, seatScale, tableBoundaries } from './TableLayout'
 
 type Item = MaterialItem<PlayerColor, LocationType>
@@ -33,6 +33,17 @@ const cardOnTable = (item: Item, context: ItemCtx) => {
   return { x, y, scale: 1 }
 }
 
+/**
+ * A musician where the player can put a wood now does not grow under the pointer: its free slots would move away from
+ * the pointer, and the click or the drop would land on the card (its help) instead of the slot.
+ */
+const isCraftingTarget = (context: ItemCtx) =>
+  context.player !== undefined &&
+  context.rules.isTurnToPlay(context.player) &&
+  context.rules
+    .getLegalMoves(context.player)
+    .some((move) => isMoveItemType(MaterialType.ViolinToken)(move) && move.location.type === LocationType.MusicianSlot && move.location.parent === context.index)
+
 /** How far a span has to move along one axis to lie between `min` and `max`: nothing when it already does. */
 const pushInside = (center: number, half: number, min: number, max: number): number => Math.min(Math.max(center, min + half), max - half) - center
 
@@ -43,6 +54,7 @@ const pushInside = (center: number, half: number, min: number, max: number): num
  */
 export const cardHoverTransform = (item: Item, context: ItemCtx): string[] => {
   if (context.type === MaterialType.CharacterCard && item.id === undefined) return []
+  if (isCraftingTarget(context)) return []
   const { x, y, scale } = cardOnTable(item, context)
   const table = tableBoundaries(context.rules, context.player)
   const dx = pushInside(x, (cardWidth * hoverScale) / 2, table.xMin, table.xMax)
