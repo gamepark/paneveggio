@@ -35,8 +35,12 @@ import {
   tokenOnViolinPitch,
   tokenOnViolinScale,
   tokenOnViolinY,
-  violinOnMusicianScale
+  violinOnMusicianScale,
+  cardHeight,
+  cardWidth,
+  stacksPanelSlot
 } from './TableLayout'
+import { StacksPanel } from './StacksPanel'
 import { ViolinDrawing } from './ViolinDrawing'
 
 /**
@@ -114,6 +118,7 @@ class MusicianSlotLocator extends Locator<PlayerColor, MaterialType, LocationTyp
   locationDescription = new MusicianSlotDescription()
 
   getPositionOnParent(location: Location<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    if (location.id === stacksPanelSlot) return { x: 50, y: 50 }
     const total = countSlots(context.rules.material(MaterialType.CharacterCard).getItem<number>(location.parent!).id)
     return { x: 84.6, y: 88.65 - (total - 1 - (location.id as number)) * 17.56 }
   }
@@ -123,8 +128,12 @@ class MusicianSlotLocator extends Locator<PlayerColor, MaterialType, LocationTyp
     return [...super.placeItem(item, context), `scale(${violinOnMusicianScale})`]
   }
 
-  /** A free slot is a drop area; a slot with a violin has a drawing of it printed on the card (ViolinDrawing). */
+  /**
+   * A free slot is a drop area; a slot with a violin has a drawing of it printed on the card (ViolinDrawing). The panel
+   * of the violins of the card (StacksPanel) is a pseudo slot, centred on the card.
+   */
   getLocationDescription(location: Location<PlayerColor, LocationType>, context: MaterialContext<PlayerColor, MaterialType, LocationType>) {
+    if (location.id === stacksPanelSlot) return stacksPanelDescription
     const taken = context.rules.material(MaterialType.ViolinToken).location(LocationType.MusicianSlot).parent(location.parent).locationId(location.id).length
     return taken ? violinDrawingDescription : this.locationDescription
   }
@@ -140,6 +149,17 @@ class ViolinDrawingDescription extends LocationDescription<PlayerColor, Material
 }
 
 const violinDrawingDescription = new ViolinDrawingDescription()
+
+class StacksPanelDescription extends LocationDescription<PlayerColor, MaterialType, LocationType> {
+  width = cardWidth
+  height = cardHeight
+  extraCss = css`
+    pointer-events: none;
+  `
+  content = StacksPanel
+}
+
+const stacksPanelDescription = new StacksPanelDescription()
 
 /** Rameau n°23: the token on its note, a little above it. */
 class OnNoteLocator extends Locator<PlayerColor, MaterialType, LocationType> {

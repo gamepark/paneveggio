@@ -40,6 +40,10 @@ export const violinOnMusicianScale = 0.8
 export const tokenOnViolinScale = 0.45
 export const tokenOnViolinPitch = 0.6
 export const tokenOnViolinY = 0.65
+/** The slot id of the panel of the violins of a musician, shown next to it under the pointer (StacksPanel). */
+export const stacksPanelSlot = -1
+/** Class of that panel: the card shows it while it is under the pointer (CharacterCardDescription.getItemExtraCss). */
+export const stacksPanelClass = 'violin-stacks-panel'
 
 /** Space between two areas of the table. */
 const gap = 0.5

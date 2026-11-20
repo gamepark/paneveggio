@@ -30,7 +30,20 @@ import {
   startingImagesFr,
   violinImages
 } from '../images/Images'
-import { boardHeight, boardWidth, cardHeight, cardRadius, cardWidth, getDisplayedPlayer, masterHeight, masterWidth, tokenImageSize } from '../locators/TableLayout'
+import { isCraftingTarget } from '../locators/CardHover'
+import {
+  boardHeight,
+  boardWidth,
+  cardHeight,
+  cardRadius,
+  cardWidth,
+  getDisplayedPlayer,
+  masterHeight,
+  masterWidth,
+  stacksPanelClass,
+  stacksPanelSlot,
+  tokenImageSize
+} from '../locators/TableLayout'
 
 /**
  * The English images are the default ones, shown in every language but French (decision of 09/11/2026 on BGA):
@@ -54,7 +67,23 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
    */
   getLocations(item: MaterialItem<PlayerColor, LocationType, number>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     if (item.id === undefined || (item.location.type !== LocationType.PartnerMusicians && item.location.type !== LocationType.MasterMusician)) return []
-    return Array.from({ length: countSlots(item.id) }, (_, slot) => ({ type: LocationType.MusicianSlot, parent: context.index, id: slot }))
+    const slots = Array.from({ length: countSlots(item.id) }, (_, slot) => ({ type: LocationType.MusicianSlot, parent: context.index, id: slot }))
+    const violins = context.rules.material(MaterialType.ViolinToken).location(LocationType.MusicianSlot).parent(context.index).length
+    // The panel of its violins, shown next to the card when it grows under the pointer (StacksPanel).
+    if (violins && !isCraftingTarget(context)) slots.push({ type: LocationType.MusicianSlot, parent: context.index, id: stacksPanelSlot })
+    return slots
+  }
+
+  /**
+   * The panel of the violins of the card shows while the card is under the pointer: the framework detects the hover on
+   * the wrapper of the item, its parent.
+   */
+  getItemExtraCss() {
+    return css`
+      *:hover > & .${stacksPanelClass} {
+        display: block;
+      }
+    `
   }
 
   /**

@@ -14,10 +14,13 @@ type Rules = MaterialRules<PlayerColor, MaterialType, LocationType>
  * on BGA, Ludo 20/11/2026): the Lutherie tokens on top in their order of arrival, the Violin token at the bottom, with
  * the name of their owner. The card itself is shown on the left with its violins and their tokens.
  */
-export const CharacterCardHelp = ({ itemIndex }: MaterialHelpProps<PlayerColor, MaterialType, LocationType>) => {
+export const CharacterCardHelp = ({ itemIndex }: MaterialHelpProps<PlayerColor, MaterialType, LocationType>) =>
+  itemIndex === undefined ? null : <ViolinStacks card={itemIndex} />
+
+/** The violins on a musician card and their piles: in its help dialog, and next to it when it grows under the pointer. */
+export const ViolinStacks = ({ card: itemIndex }: { card: number }) => {
   const { t } = useTranslation()
   const rules = useRules<Rules>()!
-  if (itemIndex === undefined) return null
   const violins = rules
     .material(MaterialType.ViolinToken)
     .location(LocationType.MusicianSlot)

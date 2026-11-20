@@ -37,7 +37,7 @@ const cardOnTable = (item: Item, context: ItemCtx) => {
  * A musician where the player can put a wood now does not grow under the pointer: its free slots would move away from
  * the pointer, and the click or the drop would land on the card (its help) instead of the slot.
  */
-const isCraftingTarget = (context: ItemCtx) =>
+export const isCraftingTarget = (context: ItemCtx) =>
   context.player !== undefined &&
   context.rules.isTurnToPlay(context.player) &&
   context.rules
