@@ -95,7 +95,7 @@ type Rect = { left: number; right: number; top: number; bottom: number }
  * The rectangle covered by a player area, from the centre of its board, full size.
  * The Contacts are in steps only for their owner, when their area is the one displayed large.
  */
-const playerArea = (rules: Rules, player: PlayerColor, viewer?: PlayerColor): Rect => {
+export const playerArea = (rules: Rules, player: PlayerColor, viewer?: PlayerColor): Rect => {
   const partners = Math.max(reservedPartners, countCards(rules, LocationType.PartnerMusicians, player), countCards(rules, LocationType.PartnerApprentices, player))
   const depth = contactsInSteps(rules, player, viewer) ? deepestContacts(rules, player) - 1 : 0
   return {

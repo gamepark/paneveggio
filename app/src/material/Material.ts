@@ -33,7 +33,7 @@ import {
   startingImagesFr,
   violinImages
 } from '../images/Images'
-import { isCraftingTarget } from '../locators/CardHover'
+import { boardHoverTransform, isCraftingTarget } from '../locators/CardHover'
 import {
   boardHeight,
   boardWidth,
@@ -173,6 +173,13 @@ class PlayerBoardDescription extends BoardDescription<PlayerColor, MaterialType,
 
   isMenuAlwaysVisible() {
     return true
+  }
+
+  /** The area of another player grows under the pointer, with everything placed on it (CardHover). */
+  hoverCarriesChildren = true
+
+  getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    return boardHoverTransform(item, context)
   }
 
   /** The 4 piles of Contacts above the board: drop areas for a discard or a swapped card (ContactsLocator). */
