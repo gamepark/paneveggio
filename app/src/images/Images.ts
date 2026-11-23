@@ -23,12 +23,14 @@ import LutherieGreen from './tokens/lutherie-green.webp'
 import LutherieOrange from './tokens/lutherie-orange.webp'
 import LutherieRed from './tokens/lutherie-red.webp'
 import Note from './tokens/note.webp'
+import PanelBackground from './panel.webp'
 import ViolinBlue from './tokens/violin-blue.webp'
 import ViolinGreen from './tokens/violin-green.webp'
 import ViolinOrange from './tokens/violin-orange.webp'
 import ViolinRed from './tokens/violin-red.webp'
 
-export { CardBack, Ducat, FirstPlayerCard, MasterBoard, Note, PlayerBoardEn, PlayerBoardFr, Star, Study, Wood }
+/** The background of the player panels: the forest of violins of the cover (Paneveggio, "la forêt des violons"). */
+export { CardBack, Ducat, FirstPlayerCard, MasterBoard, Note, PanelBackground, PlayerBoardEn, PlayerBoardFr, Star, Study, Wood }
 
 /** Solo: the board of Stradivarius of each level, the back of a player board (RULES p. 21). */
 export const soloBoardsEn: Record<SoloLevel, string> = {

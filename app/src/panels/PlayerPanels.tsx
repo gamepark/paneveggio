@@ -10,7 +10,7 @@ import { activityLevel, stradivarius } from '@gamepark/paneveggio/logic/Solo'
 import { Table } from '@gamepark/paneveggio/logic/Table'
 import { MaterialMoveBuilder, MaterialRules } from '@gamepark/rules-api'
 import { createPortal } from 'react-dom'
-import { CardBack, Ducat, lutherieImages, Note, Star, Study, violinImages, Wood } from '../images/Images'
+import { CardBack, Ducat, lutherieImages, Note, PanelBackground, Star, Study, violinImages, Wood } from '../images/Images'
 import { useTranslation } from 'react-i18next'
 import { getDisplayedPlayer } from '../locators/TableLayout'
 
@@ -52,6 +52,7 @@ export const PlayerPanels = () => {
               { image: lutherieImages[player.id], value: table.reserve(player.id).length }
             ]}
             countersPerLine={3}
+            backgroundImage={PanelBackground}
             onClick={() => play(MaterialMoveBuilder.changeView(player.id), { transient: true })}
             css={[clickable, player.id === displayed && displayedPanel]}
           />
@@ -110,7 +111,8 @@ const StradivariusPanel = ({ bot, displayed, onClick }: { bot: PlayerColor; disp
 const botPanel = css`
   position: relative;
   color: black;
-  background-color: white;
+  background: rgba(0, 0, 0, 0.8) url(${PanelBackground});
+  background-size: cover;
   border-radius: 3em 1.5em 1.5em 1.5em;
   box-shadow: 0 0 0.5em black, 0 0 0.5em black;
   display: flex;
