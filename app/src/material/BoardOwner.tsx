@@ -5,16 +5,10 @@ import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { useHoveredItems, useRules } from '@gamepark/react-game'
 import { MaterialItem, MaterialRules } from '@gamepark/rules-api'
 import { useMemo } from 'react'
+import { playerColors } from '../panels/playerColors'
 import { useAreaName } from './useAreaName'
 import { boardHeight, boardWidth, playerBoardItem, tablePlayers } from '../locators/TableLayout'
 
-/** The colour of each player (the Violin tokens). */
-const colors: Record<PlayerColor, string> = {
-  [PlayerColor.Blue]: '#1f6f7a',
-  [PlayerColor.Red]: '#b3262c',
-  [PlayerColor.Green]: '#3c7d3a',
-  [PlayerColor.Orange]: '#b5651d'
-}
 
 /**
  * The name of the owner of a board, on its top left corner, in their colour: when a click on a board shows it large,
@@ -31,7 +25,7 @@ export const BoardOwner = ({ player, large }: { player: PlayerColor; large: bool
   const fullSize = large || !!hovered?.length
   return (
     <div css={corner}>
-      <span css={[label, { background: colors[player], fontSize: fullSize ? '1em' : '2em' }]}>{name}</span>
+      <span css={[label, { background: playerColors[player], fontSize: fullSize ? '1em' : '2em' }]}>{name}</span>
     </div>
   )
 }

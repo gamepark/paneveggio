@@ -13,6 +13,7 @@ import { Locators } from './locators/Locators'
 import { Material, materialI18n } from './material/Material'
 import { PaneveggioScoring } from './scoring/PaneveggioScoring'
 import { Tutorial } from './tutorial/Tutorial'
+import { PaneveggioHistory } from './history/PaneveggioHistory'
 
 /** The texts of the header are long (many choices): smaller than the default 4.5em (Ludo, 19/11/2026). */
 const theme = {
@@ -42,6 +43,7 @@ createRoot(document.getElementById('root')!).render(
       ai={PaneveggioAI}
       scoring={new PaneveggioScoring()}
       tutorial={new Tutorial()}
+      logs={new PaneveggioHistory()}
     >
       <App />
     </GameProvider>
