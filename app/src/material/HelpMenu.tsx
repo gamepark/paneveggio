@@ -1,31 +1,27 @@
 import { css } from '@emotion/react'
 import { CustomMoveType, Resource } from '@gamepark/paneveggio/material/CustomMoveType'
-import { ItemMenuButton, PlayMoveButton, RulesDialog } from '@gamepark/react-game'
+import { PlayMoveButton, RulesDialog } from '@gamepark/react-game'
 import { CustomMove } from '@gamepark/rules-api'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Ducat, Study } from '../images/Images'
-
-type Position = { x: number; y: number }
+import { helpDucatX, helpStudyX } from '../locators/MasterBoardLayout'
+import { masterScale } from '../locators/TableLayout'
 
 /**
  * Help of the Master Luthier (RULES p. 8), on its help area: 1 token blocked there (−1 PP at the end of the game) for
- * 1 ducat or 1 study. The buttons are the ducat and study icons drawn on the board (cm from its centre). A click on
- * either one opens a dialog that explains the help, where the player chooses the resource (Ludo, 19/11/2026).
+ * 1 ducat or 1 study. While the player can ask for it, a light frame around "L ➜ ducat / study" drawn on the band shows
+ * that it can be clicked (Ludo, 23/11/2026); `y` is the band, in cm from the centre of the board. A click on it opens a
+ * dialog that explains the help, where the player chooses the resource (Ludo, 19/11/2026).
  */
-export const HelpMenu = ({ moves, ducat: ducatAt, study: studyAt }: { moves: CustomMove<CustomMoveType, Resource>[]; ducat: Position; study: Position }) => {
+export const HelpMenu = ({ moves, y }: { moves: CustomMove<CustomMoveType, Resource>[]; y: number }) => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const ducat = moves.find((move) => move.data === Resource.Ducat)
   const study = moves.find((move) => move.data === Resource.Study)
   return (
     <>
-      <ItemMenuButton title={t('help-area.title')} x={ducatAt.x} y={ducatAt.y} onClick={() => setOpen(true)}>
-        <img src={Ducat} alt="" css={icon} />
-      </ItemMenuButton>
-      <ItemMenuButton title={t('help-area.title')} x={studyAt.x} y={studyAt.y} onClick={() => setOpen(true)}>
-        <img src={Study} alt="" css={icon} />
-      </ItemMenuButton>
+      <button type="button" title={t('help-area.title')} css={frame} style={{ transform: `translate(-50%, -50%) translate(${frameX}em, ${y}em)` }} onClick={() => setOpen(true)} />
       <RulesDialog open={open} close={() => setOpen(false)}>
         <div css={dialog}>
           <h2>{t('help-area.title')}</h2>
@@ -50,8 +46,24 @@ export const HelpMenu = ({ moves, ducat: ducatAt, study: studyAt }: { moves: Cus
   )
 }
 
-const icon = css`
+/** The frame goes from the L token (2.6 cm left of the ducat, MasterBoardContent.Band) to the study icon, with a margin. */
+const frameLeft = helpDucatX - 2.6 * masterScale - 0.7
+const frameRight = helpStudyX + 0.7
+const frameX = (frameLeft + frameRight) / 2
+
+const frame = css`
+  width: ${frameRight - frameLeft}em;
   height: 1.6em;
+  padding: 0;
+  border: 0.07em solid rgba(243, 230, 204, 0.75);
+  border-radius: 0.3em;
+  background: rgba(243, 230, 204, 0.1);
+  box-shadow: 0 0 0.3em rgba(243, 230, 204, 0.35);
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: rgba(243, 230, 204, 0.25);
+  }
 `
 
 const dialog = css`

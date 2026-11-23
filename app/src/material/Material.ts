@@ -11,7 +11,7 @@ import { BoardDescription, CardDescription, ItemContext, MaterialContext, Materi
 import { CustomMoveType, NoteMove, NoteMoveType, Resource } from '@gamepark/paneveggio/material/CustomMoveType'
 import { isCustomMoveType, isMoveItemType, MaterialItem, MaterialMove, MaterialMoveBuilder } from '@gamepark/rules-api'
 import { createElement, Fragment } from 'react'
-import { bandPosition, helpDucatX, helpStudyX } from '../locators/MasterBoardLayout'
+import { bandPosition } from '../locators/MasterBoardLayout'
 import { BoardOwner } from './BoardOwner'
 import { CardMenu } from './CardMenu'
 import { CharacterCardHelp } from './CharacterCardHelp'
@@ -236,7 +236,7 @@ class MasterBoardDescription extends BoardDescription<PlayerColor, MaterialType,
     const moves = legalMoves.filter(isCustomMoveType<CustomMoveType, Resource>(CustomMoveType.AskForHelp))
     if (!moves.length) return undefined
     const y = masterHeight * (bandPosition.y / 100 - 0.5)
-    return createElement(HelpMenu, { moves, ducat: { x: helpDucatX, y }, study: { x: helpStudyX, y } })
+    return createElement(HelpMenu, { moves, y })
   }
 }
 
