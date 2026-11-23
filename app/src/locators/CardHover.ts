@@ -2,6 +2,7 @@ import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { ItemContext } from '@gamepark/react-game'
+import { hoveredItems, supportsCarriedHover } from '../material/carriedHover'
 import { isMoveItemType, MaterialItem } from '@gamepark/rules-api'
 import { boardCenter, boardHeight, boardWidth, cardHeight, cardWidth, getSeat, masterBoardCenter, masterHeight, masterWidth, playerArea, seatScale, tableBoundaries } from './TableLayout'
 
@@ -34,6 +35,8 @@ const pushRangeInside = (start: number, end: number, min: number, max: number) =
 
 /** The transform of a hovered board, inside the board, after its own scale: everything is divided by that scale. */
 export const boardHoverTransform = (item: Item, context: ItemCtx): string[] => {
+  // Without the carried hover of react-game, the board would grow alone and leave its cards behind (carriedHover).
+  if (!supportsCarriedHover) return []
   const hover = boardHover(context, item.location.player!)
   if (!hover) return []
   const { dx, dy, scale } = hover
@@ -42,7 +45,7 @@ export const boardHoverTransform = (item: Item, context: ItemCtx): string[] => {
 
 /** The board of the player is under the pointer, and the items placed on it follow it (ItemContext.hovered). */
 const isBoardHovered = (context: ItemCtx, player: PlayerColor) =>
-  !!context.hovered?.some((hovered) => hovered.type === MaterialType.PlayerBoard && hovered.item.location.player === player)
+  !!hoveredItems(context)?.some((hovered) => hovered.type === MaterialType.PlayerBoard && hovered.item.location.player === player)
 
 /** Where the card is on the table, and at which scale it is shown there (the cards of the other players are smaller). */
 const cardOnTable = (item: Item, context: ItemCtx) => {

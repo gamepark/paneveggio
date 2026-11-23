@@ -203,8 +203,8 @@ export class StartingCardsLocator extends ListLocator<PlayerColor, MaterialType,
   parentItemType = MaterialType.PlayerBoard
   gap = { x: cardPitch }
 
-  getParentItem(location: Loc) {
-    return location.player === undefined ? undefined : playerBoard(location)
+  getParentItem(location: Loc, context: Context) {
+    return location.player === undefined ? undefined : playerBoard(location, context)
   }
 
   getCoordinates(location: Loc) {
