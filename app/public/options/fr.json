@@ -6,7 +6,7 @@
   "identities.4": "Orange",
   "option.setup": "Mise en place",
   "option.setup.1": "Decks de démarrage",
-  "option.setup.1.help": "Chaque joueur reçoit un deck de démarrage tout prêt : partition, musicien Partenaire, Contacts et main. Recommandé pour une première partie.",
+  "option.setup.1.help": "Chaque joueur reçoit un deck de démarrage tout prêt : partition, musicien Partenaire, Contacts et main. Recommandé pour une première partie.",
   "option.setup.2": "Mulligan",
   "option.setup.2.help": "Chaque joueur reçoit 10 cartes, peut une fois en remettre sous la pioche et en piocher autant, puis en garde 7. Il choisit ensuite un musicien de départ, ses Contacts et sa partition.",
   "option.setup.3": "Draft",
@@ -21,9 +21,9 @@
   "option.level.1": "Pianissimo",
   "option.level.1.help": "Stradivarius confectionne, restaure et monte son niveau d'activité. Il commence.",
   "option.level.2": "Piano",
-  "option.level.2.help": "En plus : en Conservation, il défausse des couples de cartes de ses Contacts pour valoriser ses violons en Patrimoine.",
+  "option.level.2.help": "En plus : en Conservation, il défausse des couples de cartes de ses Contacts pour valoriser ses violons en Patrimoine.",
   "option.level.3": "Forte",
-  "option.level.3.help": "En plus : en Conservation, il forme des apprentis de ses Contacts pour 2 études.",
+  "option.level.3.help": "En plus : en Conservation, il forme des apprentis de ses Contacts pour 2 études.",
   "option.level.4": "Fortissimo",
-  "option.level.4.help": "En plus : vous commencez, ses jetons vont en Études, et ses musiciens de Prestige 4 valorisent ses violons."
+  "option.level.4.help": "En plus : vous commencez, ses jetons vont en Études, et ses musiciens de Prestige 4 valorisent ses violons."
 }
