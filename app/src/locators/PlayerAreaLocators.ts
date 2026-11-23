@@ -257,10 +257,21 @@ export class WoodStockLocator extends ListLocator<PlayerColor, MaterialType, Loc
 /** Heritage: a cut-out under each mark 4, 3, 2, 1, on the right edge of the board. */
 const heritageY: Record<number, number> = { 4: 21.5, 3: 34.6, 2: 48.0, 1: 61.1 }
 
+/**
+ * A cut-out of the Heritage, where a violin can be dropped to valorize it (Ludo, 23/11/2026: a violin could not be
+ * valorized, the Heritage had no drop area). The cut-outs are 2.7 cm apart.
+ */
+class HeritageDescription extends DropAreaDescription<PlayerColor, MaterialType, LocationType> {
+  width = 2.4
+  height = 2.4
+  borderRadius = 0.4
+}
+
 export class HeritageLocator extends PileLocator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.PlayerBoard
   getParentItem = playerBoard
   radius = { x: 0.7, y: 0.1 }
+  locationDescription = new HeritageDescription()
 
   getPositionOnParent(location: Loc) {
     return { x: 88.4, y: heritageY[location.id] }

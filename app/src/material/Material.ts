@@ -321,6 +321,27 @@ const woodQuality = (context: TokenContext, violin: number) =>
 const isRestoration = (move: MaterialMove, violin: number) =>
   isMoveItemType(MaterialType.LutherieToken)(move) && move.location.type === LocationType.OnViolin && move.location.parent === violin
 
+/**
+ * Collectors n°33 and n°36 (RecycleHeritage): a click on a violin of the Heritage puts it back in the reserve (Ludo,
+ * 23/11/2026: the effect could not be played, the reserve is no drop area).
+ */
+const isBackToReserve = (move: MaterialMove, violin: number) =>
+  isMoveItemType(MaterialType.ViolinToken)(move) && move.itemIndex === violin && move.location.type === LocationType.Reserve
+
+/**
+ * A valorization of a violin of the Heritage: with a single level it can reach, a click on it is enough; with several
+ * (Geminiani n°70), the framework plays no click and the violin is dragged onto the level (HeritageLocator).
+ */
+const isValorization = (move: MaterialMove, violin: number) =>
+  isMoveItemType(MaterialType.ViolinToken)(move) && move.itemIndex === violin && move.location.type === LocationType.Heritage
+
+/**
+ * A click on a violin plays its move: a token put on it (Restoration), the violin put back in the reserve, or the violin
+ * valorized.
+ */
+const isViolinClick = (move: MaterialMove, violin: number) =>
+  isRestoration(move, violin) || isBackToReserve(move, violin) || isValorization(move, violin)
+
 const isInStock =(context: TokenContext, violin: number) =>
   context.rules.material(MaterialType.ViolinToken).getItem(violin).location.type === LocationType.WoodStock
 
@@ -330,15 +351,18 @@ class ViolinTokenDescription extends WoodenTokenDescription {
   /** Shown on the card in the help of a musician, with their Lutherie tokens. */
   displayInParentItemHelp = true
 
-  /** Restoration (RULES p. 13): a click on a violin puts a token of the reserve on it. */
+  /**
+   * Restoration (RULES p. 13): a click on a violin puts a token of the reserve on it. Collectors n°33 and n°36: a click
+   * on a violin of the Heritage puts it back in the reserve.
+   */
   canShortClick(move: MaterialMove, context: TokenContext) {
-    return isRestoration(move, context.index)
+    return isViolinClick(move, context.index)
   }
 
-  /** The violins that can be restored now shine. */
+  /** The violins that can be clicked now shine. */
   highlight(_item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
     if (context.player === undefined || !context.rules.isTurnToPlay(context.player)) return undefined
-    return context.rules.getLegalMoves(context.player).some((move) => isRestoration(move, context.index)) || undefined
+    return context.rules.getLegalMoves(context.player).some((move) => isViolinClick(move, context.index)) || undefined
   }
 
   /**
