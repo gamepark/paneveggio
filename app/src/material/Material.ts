@@ -276,8 +276,17 @@ class NoteTokenDescription extends WoodenTokenDescription<undefined> {
     return moves.length ? createElement(NoteMenu, { beat, moves }) : undefined
   }
 
-  /** The notes of the action being played shine, so that everyone sees where the turn is on the sheet music. */
+  /** Rameau n°23: a click on a note puts a study on it (Ludo, 23/11/2026: a study could not be put on a note). */
+  canShortClick(move: MaterialMove, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    return isStudyOnNote(move, context.index)
+  }
+
+  /**
+   * The notes of the action being played shine, so that everyone sees where the turn is on the sheet music. Rameau
+   * n°23: the notes where a study can be put shine.
+   */
   highlight(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    if (isPlayerTurn(context) && context.rules.getLegalMoves(context.player).some((move) => isStudyOnNote(move, context.index))) return true
     const task = context.rules.remind<Task[] | undefined>(Memory.Tasks)?.[0]
     if (task?.rule !== RuleId.PlayAction || item.location.type !== LocationType.SheetMusic || item.location.player !== task.player) return undefined
     return task.beats?.includes(item.location.x!) || undefined
@@ -288,6 +297,12 @@ class NoteTokenDescription extends WoodenTokenDescription<undefined> {
     return [super.getHighlightCss(itemId, image), noteGlow]
   }
 }
+
+const isStudyOnNote = (move: MaterialMove, note: number) =>
+  isMoveItemType(MaterialType.LutherieToken)(move) && move.location.type === LocationType.OnNote && move.location.parent === note
+
+const isPlayerTurn = (context: MaterialContext<PlayerColor, MaterialType, LocationType>): context is MaterialContext<PlayerColor, MaterialType, LocationType> & { player: PlayerColor } =>
+  context.player !== undefined && context.rules.isTurnToPlay(context.player)
 
 /**
  * A number written inside a token (Ludo, 20/11/2026): the size of the pile of ducats or studies, the quality of a wood.
@@ -399,6 +414,21 @@ class LutherieTokenDescription extends WoodenTokenDescription {
   images = lutherieImages
   displayInParentItemHelp = true
 
+  /**
+   * A click on a token puts it back in the reserve, the reserve being no drop area (Ludo, 23/11/2026: lack of tokens,
+   * Apprentice n°60, payment of a valorization): the token on top of a wood or a violin, or any token of the pile of the
+   * ducats or the studies, which gives one of them.
+   */
+  canShortClick(move: MaterialMove, context: TokenContext) {
+    return isBackToReserveFromPile(move, context)
+  }
+
+  /** The tokens that a click puts back in the reserve shine. */
+  highlight(_item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
+    if (!isPlayerTurn(context)) return undefined
+    return context.rules.getLegalMoves(context.player).some((move) => isBackToReserveFromPile(move, context)) || undefined
+  }
+
   /** The top token of the ducats or the studies shows their number; the top token of a wood shows its quality. */
   getItemExtraCss(item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
     const { type, player, parent, x } = item.location
@@ -424,6 +454,16 @@ class LutherieTokenDescription extends WoodenTokenDescription {
 const reserveNumber = (item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) => {
   const pile = context.rules.material(context.type).location(LocationType.Reserve).player(item.location.player).getIndexes()
   return context.index === Math.max(...pile) ? tokenNumber(pile.length) : undefined
+}
+
+/** A move of a Lutherie token back to the reserve: this token, or another token of the same pile of ducats or studies. */
+const isBackToReserveFromPile = (move: MaterialMove, context: TokenContext) => {
+  if (!isMoveItemType(MaterialType.LutherieToken)(move) || move.location.type !== LocationType.Reserve) return false
+  if (move.itemIndex === context.index) return true
+  const tokens = context.rules.material(MaterialType.LutherieToken)
+  const clicked = tokens.getItem(context.index).location
+  const moved = tokens.getItem(move.itemIndex).location
+  return (clicked.type === LocationType.Ducats || clicked.type === LocationType.Studies) && moved.type === clicked.type && moved.player === clicked.player
 }
 
 /**
