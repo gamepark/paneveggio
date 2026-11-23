@@ -70,15 +70,31 @@ const cardOnTable = (item: Item, context: ItemCtx) => {
 }
 
 /**
- * A musician where the player can put a wood now does not grow under the pointer: its free slots would move away from
- * the pointer, and the click or the drop would land on the card (its help) instead of the slot.
+ * A musician where the player can put a wood now (Crafting), or one of whose violins the player can restore now
+ * (Restoration), does not grow under the pointer: its free slots and its violins would be hidden under the enlarged card,
+ * which only shows drawings of them, and the click or the drop would land on the card (its help) instead (Ludo,
+ * 22/11/2026: "je ne peux toujours pas cliquer sur les violons de mon adversaire").
  */
-export const isCraftingTarget = (context: ItemCtx) =>
-  context.player !== undefined &&
-  context.rules.isTurnToPlay(context.player) &&
-  context.rules
+export const isMusicianTarget = (context: ItemCtx) => {
+  if (context.player === undefined || !context.rules.isTurnToPlay(context.player)) return false
+  const violins = context.rules.material(MaterialType.ViolinToken)
+  return context.rules
     .getLegalMoves(context.player)
-    .some((move) => isMoveItemType(MaterialType.ViolinToken)(move) && move.location.type === LocationType.MusicianSlot && move.location.parent === context.index)
+    .some(
+      (move) =>
+        (isMoveItemType(MaterialType.ViolinToken)(move) && move.location.type === LocationType.MusicianSlot && move.location.parent === context.index) ||
+        (isMoveItemType(MaterialType.LutherieToken)(move) &&
+          move.location.type === LocationType.OnViolin &&
+          violins.getItem(move.location.parent!)?.location.type === LocationType.MusicianSlot &&
+          violins.getItem(move.location.parent!)?.location.parent === context.index)
+    )
+}
+
+/** The card is in the right half of the table, where it is shown now (on a hovered board, at its enlarged place). */
+export const isOnRightOfTable = (item: Item, context: ItemCtx) => {
+  const table = tableBoundaries(context.rules, context.player)
+  return cardOnTable(item, context).x > (table.xMin + table.xMax) / 2
+}
 
 /** How far a span has to move along one axis to lie between `min` and `max`: nothing when it already does. */
 const pushInside = (center: number, half: number, min: number, max: number): number => Math.min(Math.max(center, min + half), max - half) - center
@@ -90,7 +106,7 @@ const pushInside = (center: number, half: number, min: number, max: number): num
  */
 export const cardHoverTransform = (item: Item, context: ItemCtx): string[] => {
   if (context.type === MaterialType.CharacterCard && item.id === undefined) return []
-  if (isCraftingTarget(context)) return []
+  if (isMusicianTarget(context)) return []
   const { x, y, scale } = cardOnTable(item, context)
   const table = tableBoundaries(context.rules, context.player)
   const dx = pushInside(x, (cardWidth * hoverScale) / 2, table.xMin, table.xMax)

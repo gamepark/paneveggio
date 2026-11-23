@@ -33,7 +33,7 @@ import {
   startingImagesFr,
   violinImages
 } from '../images/Images'
-import { boardHoverTransform, isCraftingTarget } from '../locators/CardHover'
+import { boardHoverTransform, isMusicianTarget, isOnRightOfTable } from '../locators/CardHover'
 import {
   boardHeight,
   boardWidth,
@@ -44,6 +44,7 @@ import {
   masterHeight,
   masterWidth,
   stacksPanelClass,
+  stacksPanelLeftSlot,
   stacksPanelSlot,
   tokenImageSize
 } from '../locators/TableLayout'
@@ -73,7 +74,10 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
     const slots = Array.from({ length: countSlots(item.id) }, (_, slot) => ({ type: LocationType.MusicianSlot, parent: context.index, id: slot }))
     const violins = context.rules.material(MaterialType.ViolinToken).location(LocationType.MusicianSlot).parent(context.index).length
     // The panel of its violins, shown next to the card when it grows under the pointer (StacksPanel).
-    if (violins && !isCraftingTarget(context)) slots.push({ type: LocationType.MusicianSlot, parent: context.index, id: stacksPanelSlot })
+    if (violins && !isMusicianTarget(context)) {
+      const id = isOnRightOfTable(item, context) ? stacksPanelLeftSlot : stacksPanelSlot
+      slots.push({ type: LocationType.MusicianSlot, parent: context.index, id })
+    }
     return slots
   }
 

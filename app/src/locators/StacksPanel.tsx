@@ -1,7 +1,7 @@
 import { css } from '@emotion/react'
 import { Location } from '@gamepark/rules-api'
 import { ViolinStacks } from '../material/CharacterCardHelp'
-import { stacksPanelClass } from './TableLayout'
+import { stacksPanelClass, stacksPanelLeftSlot } from './TableLayout'
 
 /**
  * The white panel of the help dialog, on the right of a musician that grows under the pointer: its violins and the
@@ -9,10 +9,15 @@ import { stacksPanelClass } from './TableLayout'
  * the card is hovered, so it grows with the card.
  */
 export const StacksPanel = ({ location }: { location: Location }) => (
-  <div className={stacksPanelClass} css={panel}>
+  <div className={stacksPanelClass} css={[panel, location.id === stacksPanelLeftSlot && onLeft]}>
     <ViolinStacks card={location.parent!} />
   </div>
 )
+
+const onLeft = css`
+  left: auto;
+  right: calc(100% + 0.15em);
+`
 
 const panel = css`
   display: none;

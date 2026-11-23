@@ -38,7 +38,7 @@ import {
   violinOnMusicianScale,
   cardHeight,
   cardWidth,
-  stacksPanelSlot
+  isStacksPanelSlot
 } from './TableLayout'
 import { StacksPanel } from './StacksPanel'
 import { ViolinDrawing } from './ViolinDrawing'
@@ -118,7 +118,7 @@ class MusicianSlotLocator extends Locator<PlayerColor, MaterialType, LocationTyp
   locationDescription = new MusicianSlotDescription()
 
   getPositionOnParent(location: Location<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
-    if (location.id === stacksPanelSlot) return { x: 50, y: 50 }
+    if (isStacksPanelSlot(location.id)) return { x: 50, y: 50 }
     const total = countSlots(context.rules.material(MaterialType.CharacterCard).getItem<number>(location.parent!).id)
     return { x: 84.6, y: 88.65 - (total - 1 - (location.id as number)) * 17.56 }
   }
@@ -133,7 +133,7 @@ class MusicianSlotLocator extends Locator<PlayerColor, MaterialType, LocationTyp
    * of the violins of the card (StacksPanel) is a pseudo slot, centred on the card.
    */
   getLocationDescription(location: Location<PlayerColor, LocationType>, context: MaterialContext<PlayerColor, MaterialType, LocationType>) {
-    if (location.id === stacksPanelSlot) return stacksPanelDescription
+    if (isStacksPanelSlot(location.id)) return stacksPanelDescription
     const taken = context.rules.material(MaterialType.ViolinToken).location(LocationType.MusicianSlot).parent(location.parent).locationId(location.id).length
     return taken ? violinDrawingDescription : this.locationDescription
   }

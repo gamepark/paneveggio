@@ -42,6 +42,12 @@ export const tokenOnViolinPitch = 0.6
 export const tokenOnViolinY = 0.65
 /** The slot id of the panel of the violins of a musician, shown next to it under the pointer (StacksPanel). */
 export const stacksPanelSlot = -1
+/**
+ * The same panel on the left of the musician: a musician in the right half of the table shows it there, as on its right
+ * it would go under the player panels (Ludo, 23/11/2026).
+ */
+export const stacksPanelLeftSlot = -2
+export const isStacksPanelSlot = (id: unknown) => id === stacksPanelSlot || id === stacksPanelLeftSlot
 /** Class of that panel: the card shows it while it is under the pointer (CharacterCardDescription.getItemExtraCss). */
 export const stacksPanelClass = 'violin-stacks-panel'
 
