@@ -10,7 +10,7 @@ import { BEATS } from '../logic/SheetMusic'
 import { Table } from '../logic/Table'
 import { PlayerColor } from '../PlayerColor'
 import { RuleId } from './RuleId'
-import { startTurn } from './StartTurn'
+import { startGame } from './StartTurn'
 import { Move, PaneveggioTurnRule } from './TaskRule'
 
 const KEEP = 7
@@ -46,7 +46,7 @@ export class ChooseStartingDeckRule extends PaneveggioTurnRule {
       const unused = this.available.maxBy((item) => item.location.x ?? 0).getItem<Action>()!.id
       moves.push(...firstGameMasterMoves(this, startingDecks[unused].musician))
       moves.push(this.material(MaterialType.StartingCard).deleteItemsAtOnce())
-      return [...moves, ...startTurn(this, players[0])]
+      return [...moves, ...startGame(this)]
     }
     return []
   }
@@ -233,6 +233,6 @@ export class ArrangeStartRule extends SimultaneousRule<PlayerColor, MaterialType
   }
 
   getMovesAfterPlayersDone(): MaterialMove<PlayerColor, MaterialType, LocationType, RuleId>[] {
-    return startTurn(this, this.game.players[0])
+    return startGame(this)
   }
 }

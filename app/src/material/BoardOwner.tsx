@@ -2,10 +2,11 @@ import { css } from '@emotion/react'
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
-import { useHoveredItems, usePlayerName, useRules } from '@gamepark/react-game'
+import { useHoveredItems, useRules } from '@gamepark/react-game'
 import { MaterialItem, MaterialRules } from '@gamepark/rules-api'
 import { useMemo } from 'react'
-import { boardHeight, boardWidth } from '../locators/TableLayout'
+import { useAreaName } from './useAreaName'
+import { boardHeight, boardWidth, playerBoardItem, tablePlayers } from '../locators/TableLayout'
 
 /** The colour of each player (the Violin tokens). */
 const colors: Record<PlayerColor, string> = {
@@ -22,11 +23,11 @@ const colors: Record<PlayerColor, string> = {
  * then the size of the name of the large board (Ludo, 22/11/2026).
  */
 export const BoardOwner = ({ player, large }: { player: PlayerColor; large: boolean }) => {
-  const name = usePlayerName(player)
-  const rules = useRules<MaterialRules<PlayerColor, MaterialType, LocationType>>()
-  // The boards are static items, one per player in the order of the players (PlayerBoardDescription.getStaticItems)
-  const board = useMemo<MaterialItem>(() => ({ location: { type: LocationType.PlayerBoard, player } }), [player])
-  const { hovered } = useHoveredItems(MaterialType.PlayerBoard, rules?.players.indexOf(player) ?? -1, board)
+  const name = useAreaName(player)
+  const rules = useRules<MaterialRules<PlayerColor, MaterialType, LocationType>>()!
+  // The boards are static items, one per area in the order of the table (PlayerBoardDescription.getStaticItems)
+  const board = useMemo<MaterialItem>(() => playerBoardItem(rules, player), [rules, player])
+  const { hovered } = useHoveredItems(MaterialType.PlayerBoard, tablePlayers(rules).indexOf(player), board)
   const fullSize = large || !!hovered?.length
   return (
     <div css={corner}>

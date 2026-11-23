@@ -15,5 +15,15 @@
   "option.decks.1": "Au hasard",
   "option.decks.1.help": "Chaque joueur reçoit un deck de démarrage tiré au hasard.",
   "option.decks.2": "Choix des joueurs",
-  "option.decks.2.help": "À tour de rôle, dans le sens antihoraire en commençant par le dernier joueur, chacun choisit un des decks de démarrage restants. Le premier joueur choisit en dernier."
+  "option.decks.2.help": "À tour de rôle, dans le sens antihoraire en commençant par le dernier joueur, chacun choisit un des decks de démarrage restants. Le premier joueur choisit en dernier.",
+  "option.level": "Niveau de Stradivarius",
+  "option.level.help": "En solo, vous affrontez le bot Stradivarius. Chaque niveau ajoute des règles au précédent.",
+  "option.level.1": "Pianissimo",
+  "option.level.1.help": "Stradivarius confectionne, restaure et monte son niveau d'activité. Il commence.",
+  "option.level.2": "Piano",
+  "option.level.2.help": "En plus : en Conservation, il défausse des couples de cartes de ses Contacts pour valoriser ses violons en Patrimoine.",
+  "option.level.3": "Forte",
+  "option.level.3.help": "En plus : en Conservation, il forme des apprentis de ses Contacts pour 2 études.",
+  "option.level.4": "Fortissimo",
+  "option.level.4.help": "En plus : vous commencez, ses jetons vont en Études, et ses musiciens de Prestige 4 valorisent ses violons."
 }

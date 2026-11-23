@@ -1,11 +1,12 @@
-import { computeScore } from '@gamepark/paneveggio/logic/Scoring'
 import { Table } from '@gamepark/paneveggio/logic/Table'
 import { Action } from '@gamepark/paneveggio/material/Action'
 import { getAffiliation } from '@gamepark/paneveggio/material/CharacterCard'
 import { PaneveggioRules } from '@gamepark/paneveggio/PaneveggioRules'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
+import { computeScore } from '@gamepark/paneveggio/logic/Scoring'
 import { ScoringDescription } from '@gamepark/react-game'
 import { Trans } from 'react-i18next'
+import { SoloResult, SoloResultDetail } from './SoloResult'
 
 enum ScoringKey {
   Violins = 1,
@@ -35,6 +36,10 @@ const apprenticeKeys: Partial<Record<ScoringKey, Action>> = {
  * from the table (computeScore), nothing is remembered.
  */
 export class PaneveggioScoring implements ScoringDescription<PlayerColor, PaneveggioRules, ScoringKey> {
+  /** Solo: who wins, the score of Stradivarius and where it comes from (he has no seat, so no column of the table). */
+  ResultHeader = SoloResult
+  ResultDialogHeader = SoloResultDetail
+
   getScoringKeys(): ScoringKey[] {
     return [
       ScoringKey.Violins,

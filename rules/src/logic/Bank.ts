@@ -74,6 +74,25 @@ export class Bank {
     return this.move(LocationType.HelpArea, LocationType.Reserve, n)
   }
 
+  /** A token that comes back into a pool through a move planned elsewhere (the wear of the violins of Stradivarius). */
+  deposit(location: LocationType, token: number) {
+    this.pools.get(location)!.push(token)
+  }
+
+  /** Solo: Stradivarius blocks a token of his reserve on the help area (−1 PP), without any gain (RULES p. 22). */
+  block(): Move[] {
+    return this.move(LocationType.Reserve, LocationType.HelpArea, 1)
+  }
+
+  /**
+   * Solo [S16]: with an empty reserve, Stradivarius takes back a token of his Ducats area, or else of his Studies area,
+   * as a player who lacks tokens.
+   */
+  refill(): Move[] {
+    if (this.reserve) return []
+    return this.count(LocationType.Ducats) ? this.pay(Resource.Ducat, 1) : this.pay(Resource.Study, 1)
+  }
+
   /** Put a token of the reserve on top of a pile (wood or violin). */
   stack(violin: number, quality: number): Move[] {
     if (quality >= MAX_QUALITY) return []

@@ -18,6 +18,8 @@ import {
   ReserveLocator,
   ReturnedTokensLocator,
   StartingCardsLocator,
+  ActivityTrackLocator,
+  StradivariusContactsLocator,
   SheetMusicLocator,
   studiesLocator,
   TurnDiscardLocator,
@@ -38,7 +40,8 @@ import {
   violinOnMusicianScale,
   cardHeight,
   cardWidth,
-  isStacksPanelSlot
+  isStacksPanelSlot,
+  tablePlayers
 } from './TableLayout'
 import { StacksPanel } from './StacksPanel'
 import { ViolinDrawing } from './ViolinDrawing'
@@ -81,7 +84,7 @@ class HelpAreaLocator extends PileLocator<PlayerColor, MaterialType, LocationTyp
 
   getItemCoordinates(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
     const { x = 0, y = 0, z = 0 } = super.getItemCoordinates(item, context)
-    const players = context.rules.players
+    const players = tablePlayers(context.rules)
     const seat = players.indexOf(item.id as PlayerColor)
     return { x: x + helpTokensX + (seat - (players.length - 1) / 2) * helpPilePitch, y, z }
   }
@@ -234,5 +237,7 @@ export const Locators: Partial<Record<LocationType, Locator<PlayerColor, Materia
   [LocationType.Heritage]: new HeritageLocator(),
   [LocationType.MusicianSlot]: new MusicianSlotLocator(),
   [LocationType.OnViolin]: new OnViolinLocator(),
-  [LocationType.OnNote]: new OnNoteLocator()
+  [LocationType.OnNote]: new OnNoteLocator(),
+  [LocationType.ActivityTrack]: new ActivityTrackLocator(),
+  [LocationType.StradivariusContacts]: new StradivariusContactsLocator()
 }

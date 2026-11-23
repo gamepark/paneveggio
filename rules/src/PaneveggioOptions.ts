@@ -20,6 +20,16 @@ export enum DeckDistribution {
 }
 
 /**
+ * Solo (RULES p. 21 to 24, misc/docs/SOLO.md): the 4 levels of Stradivarius, each one adding rules to the one before.
+ */
+export enum SoloLevel {
+  Pianissimo = 1,
+  Piano,
+  Forte,
+  Fortissimo
+}
+
+/**
  * This is the options for each player in the game.
  */
 type PlayerOptions = { id: PlayerColor }
@@ -31,6 +41,8 @@ export type PaneveggioOptions = {
   players: PlayerOptions[]
   setup?: SetupMode
   decks?: DeckDistribution
+  /** Solo: the level of Stradivarius. */
+  level?: SoloLevel
 }
 
 /**
@@ -52,14 +64,16 @@ export type PaneveggioOptions = {
  */
 export const PaneveggioOptionsSpecV2: OptionsSpecV2 = {
   specVersion: 2,
-  players: { min: 2, max: 4 },
+  players: { min: 1, max: 4 },
   identities: { values: getEnumValues(PlayerColor) },
   options: {
-    setup: { kind: 'enum', values: getEnumValues(SetupMode) },
+    // "Pas de draft" in solo (RULES p. 21).
+    setup: { kind: 'enum', values: [SetupMode.StartingDecks, SetupMode.Mulligan, { value: SetupMode.Draft, playerCount: { min: 2 } }] },
     decks: {
       kind: 'enum',
       values: getEnumValues(DeckDistribution),
       requires: [{ option: 'setup', values: [SetupMode.StartingDecks] }]
-    }
+    },
+    level: { kind: 'enum', values: getEnumValues(SoloLevel), playerCount: { max: 1 } }
   }
 }

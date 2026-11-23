@@ -51,5 +51,21 @@ export enum RuleId {
 
   // ------------------------------------------------------------------ end of the game
   FinalSheetMusic,
-  FinalApprentices
+  FinalApprentices,
+
+  // ------------------------------------------------------------------ solo: Stradivarius, played automatically
+  // At the end, after the other values: the games already started keep their numbers.
+
+  /** His partners, his Contacts, then the first turn. */
+  SetupStradivarius,
+  /** His tokens given back go to his Studies, then a Conservation or a Workshop. */
+  StradivariusTurn,
+  /** Confection cards, Heritage, valorizations of the Piano. */
+  StradivariusConservation,
+  /** End of the Conservation: his level of activity, his musicians, an apprentice (Forte). */
+  StradivariusActivity,
+  /** Free crafting, then the bonus effects of his partners. */
+  StradivariusWorkshop,
+  /** Wear of his violins, restorations, valorization of the Fortissimo. */
+  StradivariusEndOfTurn
 }

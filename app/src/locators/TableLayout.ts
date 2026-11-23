@@ -1,7 +1,8 @@
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
-import { MaterialRules, XYCoordinates } from '@gamepark/rules-api'
+import { soloLevel, stradivarius } from '@gamepark/paneveggio/logic/Solo'
+import { MaterialItem, MaterialRules, XYCoordinates } from '@gamepark/rules-api'
 
 /**
  * The whole table, in centimetres, at the scale of the real components (decision of 19/11/2026, like D6 on BGA):
@@ -114,6 +115,21 @@ export const playerArea = (rules: Rules, player: PlayerColor, viewer?: PlayerCol
 
 // ------------------------------------------------------------------ players
 
+/** The areas on the table: the players, and in solo Stradivarius after them, among the other players. */
+export const tablePlayers = (rules: Rules): PlayerColor[] => {
+  const bot = stradivarius(rules.game)
+  return bot === undefined ? rules.players : [...rules.players, bot]
+}
+
+/**
+ * The static board of an area (PlayerBoardDescription.getStaticItems): the board of Stradivarius is the one of his level,
+ * its id (RULES p. 21).
+ */
+export const playerBoardItem = (rules: Rules, player: PlayerColor): MaterialItem<PlayerColor, LocationType> =>
+  player === stradivarius(rules.game)
+    ? { id: soloLevel(rules), location: { type: LocationType.PlayerBoard, player } }
+    : { location: { type: LocationType.PlayerBoard, player } }
+
 /**
  * The player whose area is displayed large: the one whose panel or board was clicked last, which the framework keeps
  * in `game.view` (a local move, never sent to the server), or else the player who looks at the table, or else the
@@ -124,8 +140,9 @@ export const getDisplayedPlayer = (rules: Rules, viewer?: PlayerColor): PlayerCo
 
 /** The players in the order of the table, starting with the one displayed large. */
 export const playersFromDisplayed = (rules: Rules, viewer?: PlayerColor): PlayerColor[] => {
-  const start = Math.max(0, rules.players.indexOf(getDisplayedPlayer(rules, viewer)))
-  return [...rules.players.slice(start), ...rules.players.slice(0, start)]
+  const players = tablePlayers(rules)
+  const start = Math.max(0, players.indexOf(getDisplayedPlayer(rules, viewer)))
+  return [...players.slice(start), ...players.slice(0, start)]
 }
 
 /** 0 for the player displayed large, then 1, 2… for the others in the order of play. */
@@ -189,7 +206,7 @@ export const tableBoundaries = (rules: Rules, viewer?: PlayerColor) => {
 
 /** What moves the boards: the number of partners and the depth of the Contacts of each player. */
 export const layoutDependencies = (rules: Rules) =>
-  rules.players.map((player) => [
+  tablePlayers(rules).map((player) => [
     countCards(rules, LocationType.PartnerMusicians, player),
     countCards(rules, LocationType.PartnerApprentices, player),
     deepestContacts(rules, player)

@@ -289,3 +289,18 @@ export const EndTurnHeader = () => {
 export const FinalSheetMusicHeader = () => <PlayerHeader name="final-sheet-music" components={{ done: <PlayMoveButton move={usePass()} /> }} />
 
 export const FinalApprenticesHeader = () => <PlayerHeader name="final-apprentices" components={{ done: <PlayMoveButton move={usePass()} /> }} />
+
+// ------------------------------------------------------------------ solo: Stradivarius
+
+/** The steps of Stradivarius play on their own: what he does, for everyone (he has no seat, no name of a player). */
+const StradivariusHeader = ({ name }: { name: string }) => {
+  const { t } = useTranslation()
+  return <>{t(`header.stradivarius.${name}`)}</>
+}
+
+export const SetupStradivariusHeader = () => <StradivariusHeader name="setup" />
+export const StradivariusTurnHeader = () => <StradivariusHeader name="turn" />
+export const StradivariusConservationHeader = () => <StradivariusHeader name="conservation" />
+export const StradivariusActivityHeader = () => <StradivariusHeader name="activity" />
+export const StradivariusWorkshopHeader = () => <StradivariusHeader name="workshop" />
+export const StradivariusEndOfTurnHeader = () => <StradivariusHeader name="end-of-turn" />

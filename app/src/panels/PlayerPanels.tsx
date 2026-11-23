@@ -4,12 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
-import { StyledPlayerPanel, usePlay, usePlayerId, usePlayers, useRules } from '@gamepark/react-game'
-import { computeScore, currentScore } from '@gamepark/paneveggio/logic/Scoring'
+import { Counters, StyledPlayerPanel, usePlay, usePlayerId, usePlayers, useRules } from '@gamepark/react-game'
+import { computeScore, currentScore, stradivariusScore } from '@gamepark/paneveggio/logic/Scoring'
+import { activityLevel, stradivarius } from '@gamepark/paneveggio/logic/Solo'
 import { Table } from '@gamepark/paneveggio/logic/Table'
 import { MaterialMoveBuilder, MaterialRules } from '@gamepark/rules-api'
 import { createPortal } from 'react-dom'
-import { CardBack, Ducat, lutherieImages, Star, Study, violinImages, Wood } from '../images/Images'
+import { CardBack, Ducat, lutherieImages, Note, Star, Study, violinImages, Wood } from '../images/Images'
+import { useTranslation } from 'react-i18next'
 import { getDisplayedPlayer } from '../locators/TableLayout'
 
 /**
@@ -29,6 +31,7 @@ export const PlayerPanels = () => {
     return null
   }
   const displayed = getDisplayedPlayer(rules, me)
+  const bot = stradivarius(rules.game)
   const table = new Table(rules)
   const over = rules.isOver()
 
@@ -55,6 +58,12 @@ export const PlayerPanels = () => {
           {player.id !== displayed && <FontAwesomeIcon icon={faEye} css={eye} />}
         </div>
       ))}
+      {bot !== undefined && (
+        <div css={panelPosition(players.length)}>
+          <StradivariusPanel bot={bot} displayed={bot === displayed} onClick={() => play(MaterialMoveBuilder.changeView(bot), { transient: true })} />
+          {bot !== displayed && <FontAwesomeIcon icon={faEye} css={eye} />}
+        </div>
+      )}
     </>,
     root
   )
@@ -65,6 +74,74 @@ const panelPosition = (index: number) => css`
   right: 1em;
   top: ${8.5 + index * 16}em;
   width: 28em;
+`
+
+/**
+ * Solo: the panel of Stradivarius, who has no seat (no avatar, no timer): his score, his violins crafted /12, his level of
+ * activity, ducats, studies, cards of his line of Contacts and Lutherie tokens left in reserve.
+ */
+const StradivariusPanel = ({ bot, displayed, onClick }: { bot: PlayerColor; displayed: boolean; onClick: () => void }) => {
+  const { t } = useTranslation()
+  const rules = useRules<MaterialRules<PlayerColor, MaterialType, LocationType>>()!
+  const table = new Table(rules)
+  const score = rules.isOver() ? stradivariusScore(rules, bot).total : currentScore(rules, bot)
+  return (
+    <div css={[botPanel, clickable, displayed && displayedPanel]} onClick={onClick}>
+      <img src={violinImages[bot]} alt="" css={botAvatar} />
+      <h2 css={botName}>{t('solo.stradivarius')}</h2>
+      <div css={botMain}>
+        <Counters counters={[{ image: Star, value: score }]} lineSize={1} />
+      </div>
+      <Counters
+        counters={[
+          { image: violinImages[bot], value: `${table.madeViolins(bot).length}/12` },
+          { image: Note, value: `${activityLevel(rules, bot)}/4` },
+          { image: Ducat, value: table.ducats(bot).length },
+          { image: Study, value: table.studies(bot).length },
+          { image: CardBack, value: rules.material(MaterialType.CharacterCard).location(LocationType.StradivariusContacts).player(bot).length },
+          { image: lutherieImages[bot], value: table.reserve(bot).length }
+        ]}
+        lineSize={3}
+      />
+    </div>
+  )
+}
+
+const botPanel = css`
+  position: relative;
+  color: black;
+  background-color: white;
+  border-radius: 3em 1.5em 1.5em 1.5em;
+  box-shadow: 0 0 0.5em black, 0 0 0.5em black;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  padding: 0.5em;
+`
+
+const botAvatar = css`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6em;
+  width: 6em;
+  border-radius: 100%;
+  background: #f3e6cc;
+`
+
+const botName = css`
+  align-self: end;
+  margin: 0;
+  font-size: 2.4em;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 0.1em 0.3em;
+  border-radius: 0.4em;
+`
+
+const botMain = css`
+  align-self: flex-end;
+  min-height: 3.4em;
 `
 
 const clickable = css`

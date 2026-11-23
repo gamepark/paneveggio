@@ -4,6 +4,8 @@ import { Action } from '@gamepark/paneveggio/material/Action'
 import { LocationType } from '@gamepark/paneveggio/material/LocationType'
 import { MaterialType } from '@gamepark/paneveggio/material/MaterialType'
 import { startingDecks } from '@gamepark/paneveggio/material/StartingDeck'
+import { soloLevel, stradivarius } from '@gamepark/paneveggio/logic/Solo'
+import { SoloLevel } from '@gamepark/paneveggio/PaneveggioOptions'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import { MaterialHelpProps, usePlayerName, useRules } from '@gamepark/react-game'
 import { MaterialRules } from '@gamepark/rules-api'
@@ -29,7 +31,9 @@ const Section = ({ title, children }: { title: string; children: ReactNode }) =>
 /** Player board (RULES p. 5 and 7): every area, and the two sequences of a turn. */
 export const PlayerBoardHelp = ({ item }: Props) => {
   const { t } = useTranslation()
+  const rules = useRules<Rules>()
   const player = usePlayerName(item.location?.player)
+  if (rules && item.location?.player === stradivarius(rules.game)) return <StradivariusBoardHelp />
   return (
     <div css={help}>
       <h2>{t('help.board.title', { player })}</h2>
@@ -47,6 +51,32 @@ export const PlayerBoardHelp = ({ item }: Props) => {
   )
 }
 
+/**
+ * Solo: the board of Stradivarius (RULES p. 21 to 24, misc/docs/SOLO.md): how he plays, the rules of his level and of the
+ * levels before it, his score, and the swap with his line of Contacts.
+ */
+const StradivariusBoardHelp = () => {
+  const { t } = useTranslation()
+  const rules = useRules<Rules>()!
+  const level = soloLevel(rules)
+  return (
+    <div css={help}>
+      <h2>{t('help.solo.title', { level: t(`help.solo.level.${level}`) })}</h2>
+      <p>{t('help.solo.text')}</p>
+      <Section title={t('help.solo.activity')}>{t('help.solo.activity.text')}</Section>
+      <Section title={t('help.solo.turn')}>{t('help.solo.turn.text')}</Section>
+      <Section title={t('help.conservation')}>{t('help.solo.conservation.text')}</Section>
+      <Section title={t('help.workshop')}>{t('help.solo.workshop.text')}</Section>
+      <Section title={t('help.solo.end-of-turn')}>{t('help.solo.end-of-turn.text')}</Section>
+      {level >= SoloLevel.Piano && <Section title={t('help.solo.level.2')}>{t('help.solo.piano.text')}</Section>}
+      {level >= SoloLevel.Forte && <Section title={t('help.solo.level.3')}>{t('help.solo.forte.text')}</Section>}
+      {level >= SoloLevel.Fortissimo && <Section title={t('help.solo.level.4')}>{t('help.solo.fortissimo.text')}</Section>}
+      <Section title={t('help.contacts')}>{t('help.solo.contacts.text')}</Section>
+      <Section title={t('help.solo.score')}>{t('help.solo.score.text')}</Section>
+    </div>
+  )
+}
+
 /** Master Luthier board (RULES p. 6 and 8): its musicians and their extra cost, the help area. */
 export const MasterBoardHelp = () => {
   const { t } = useTranslation()
@@ -60,8 +90,16 @@ export const MasterBoardHelp = () => {
 }
 
 /** A Note token (RULES p. 5 and 9). */
-export const NoteTokenHelp = () => {
+export const NoteTokenHelp = ({ item }: Props) => {
   const { t } = useTranslation()
+  if (item.location?.type === LocationType.ActivityTrack) {
+    return (
+      <div css={help}>
+        <h2>{t('help.solo.activity')}</h2>
+        <p>{t('help.solo.activity.text')}</p>
+      </div>
+    )
+  }
   return (
     <div css={help}>
       <h2>{t('help.note.title')}</h2>

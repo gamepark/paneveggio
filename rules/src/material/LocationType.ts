@@ -60,5 +60,13 @@ export enum LocationType {
   /** A Lutherie token on a Violin token (wood or violin): its quality. parent = the Violin token, x = 0 for the lowest. */
   OnViolin,
   /** Rameau n°23: a Lutherie token on a Note token, whose action is worth 3 beats (RULES p. 20). parent = the note. */
-  OnNote
+  OnNote,
+
+  // ------------------------------------------------------------------ solo: Stradivarius (player = his color)
+  // At the end, after the other values: the games already started keep their numbers.
+
+  /** The activity track of his board: a Note token, x = his level of activity, 1 to 4 (RULES p. 21). */
+  ActivityTrack,
+  /** His line of Contacts: x = the place from left to right, every card visible and swappable [S14]. */
+  StradivariusContacts
 }

@@ -7,7 +7,8 @@ import { LocationType } from './material/LocationType'
 import { MaterialType } from './material/MaterialType'
 import { Memory } from './material/Memory'
 import { startingDecks } from './material/StartingDeck'
-import { DeckDistribution, PaneveggioOptions, SetupMode } from './PaneveggioOptions'
+import { stradivarius } from './logic/Solo'
+import { DeckDistribution, PaneveggioOptions, SetupMode, SoloLevel } from './PaneveggioOptions'
 import { PaneveggioRules } from './PaneveggioRules'
 import { PlayerColor } from './PlayerColor'
 import { RuleId } from './rules/RuleId'
@@ -28,7 +29,12 @@ export class PaneveggioSetup extends MaterialGameSetup<PlayerColor, MaterialType
 
   setupMaterial(options: PaneveggioOptions) {
     for (const player of this.players) this.setupTokens(player)
-    this.material(MaterialType.FirstPlayerCard).createItem({ location: { type: LocationType.FirstPlayer, player: this.players[0] } })
+    const bot = stradivarius(this.game)
+    const level = options.level ?? SoloLevel.Pianissimo
+    if (bot !== undefined) this.setupStradivarius(bot, level)
+    // "Stradivarius joue en premier. Il prend donc la carte Premier Joueur", except at the Fortissimo (RULES p. 21, 24).
+    const first = bot !== undefined && level !== SoloLevel.Fortissimo ? bot : this.players[0]
+    this.material(MaterialType.FirstPlayerCard).createItem({ location: { type: LocationType.FirstPlayer, player: first } })
     const mode = options.setup ?? SetupMode.StartingDecks
     if (mode === SetupMode.StartingDecks) {
       this.setupDeck(characterCards)
@@ -56,6 +62,18 @@ export class PaneveggioSetup extends MaterialGameSetup<PlayerColor, MaterialType
     this.material(MaterialType.LutherieToken).createItems(range(LUTHERIE_TOKENS - 1).map(() => ({ id: player, location: { type: LocationType.Reserve, player } })))
   }
 
+  /**
+   * Solo (RULES p. 21): "Donnez-lui le plateau du niveau de difficulté que vous souhaitez jouer, les jetons Lutherie et
+   * Violon d'une couleur. Placez 1 jeton Note au niveau d'activité 1 de son plateau personnel." All his tokens are in
+   * his reserve (BGA). His cards come at the end of the setup of the player (SetupStradivarius).
+   */
+  setupStradivarius(bot: PlayerColor, level: SoloLevel) {
+    this.memorize(Memory.SoloLevel, level)
+    this.material(MaterialType.ViolinToken).createItems(range(VIOLIN_TOKENS).map(() => ({ id: bot, location: { type: LocationType.Reserve, player: bot } })))
+    this.material(MaterialType.LutherieToken).createItems(range(LUTHERIE_TOKENS).map(() => ({ id: bot, location: { type: LocationType.Reserve, player: bot } })))
+    this.material(MaterialType.NoteToken).createItem({ location: { type: LocationType.ActivityTrack, player: bot, x: 1 } })
+  }
+
   /** "Les cartes Personnage sont mélangées puis placées faces cachées pour former une pioche centrale" (RULES p. 6) */
   setupDeck(cards: number[]) {
     this.material(MaterialType.CharacterCard).createItems(cards.map((id) => ({ id, location: { type: LocationType.Deck } })))
@@ -78,6 +96,8 @@ export class PaneveggioSetup extends MaterialGameSetup<PlayerColor, MaterialType
       // [H19] counterclockwise from the last player: the first player chooses last.
       return this.startPlayerTurn(RuleId.ChooseStartingDeck, this.players[this.players.length - 1])
     }
+    const bot = stradivarius(this.game)
+    if (bot !== undefined) return this.startPlayerTurn(RuleId.SetupStradivarius, bot)
     const first = this.players[0]
     this.memorize(Memory.Tasks, [task(RuleId.SpreadReturnedTokens, first, {}, true), task(RuleId.SheetMusic, first, {}, true)])
     this.startPlayerTurn(RuleId.SpreadReturnedTokens, first)

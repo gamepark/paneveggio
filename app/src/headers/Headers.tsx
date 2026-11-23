@@ -36,7 +36,13 @@ import {
   ConservationHeader,
   EndTurnHeader,
   FinalSheetMusicHeader,
-  FinalApprenticesHeader
+  FinalApprenticesHeader,
+  SetupStradivariusHeader,
+  StradivariusTurnHeader,
+  StradivariusConservationHeader,
+  StradivariusActivityHeader,
+  StradivariusWorkshopHeader,
+  StradivariusEndOfTurnHeader
 } from './RuleHeaders'
 
 export const Headers: Partial<Record<RuleId, ComponentType>> = {
@@ -75,6 +81,12 @@ export const Headers: Partial<Record<RuleId, ComponentType>> = {
   [RuleId.Conservation]: ConservationHeader,
   [RuleId.EndTurn]: EndTurnHeader,
   [RuleId.FinalSheetMusic]: FinalSheetMusicHeader,
-  [RuleId.FinalApprentices]: FinalApprenticesHeader
+  [RuleId.FinalApprentices]: FinalApprenticesHeader,
+  [RuleId.SetupStradivarius]: SetupStradivariusHeader,
+  [RuleId.StradivariusTurn]: StradivariusTurnHeader,
+  [RuleId.StradivariusConservation]: StradivariusConservationHeader,
+  [RuleId.StradivariusActivity]: StradivariusActivityHeader,
+  [RuleId.StradivariusWorkshop]: StradivariusWorkshopHeader,
+  [RuleId.StradivariusEndOfTurn]: StradivariusEndOfTurnHeader
 }
 

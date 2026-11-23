@@ -7,6 +7,7 @@ import { isMoveItemType, Location, MaterialItem, MaterialMove } from '@gamepark/
 import {
   apprenticesY,
   boardCenter,
+  boardWidth,
   cardHeight,
   cardRadius,
   cardWidth,
@@ -21,6 +22,7 @@ import {
   handY,
   layoutDependencies,
   leftColumnX,
+  playerBoardItem,
   masterBoardCenter,
   masterHeight,
   musiciansY,
@@ -53,9 +55,7 @@ export class PlayerBoardLocator extends Locator<PlayerColor, MaterialType, Locat
 }
 
 /** The static board item of the player who owns the location. */
-const playerBoard = (location: Loc): MaterialItem<PlayerColor, LocationType> => ({
-  location: { type: LocationType.PlayerBoard, player: location.player }
-})
+export const playerBoard = (location: Loc, context: Context): MaterialItem<PlayerColor, LocationType> => playerBoardItem(context.rules, location.player!)
 
 // ------------------------------------------------------------------ around the board (cm from the centre of the board)
 
@@ -137,6 +137,34 @@ export class PartnerApprenticesLocator extends ListLocator<PlayerColor, Material
 
   getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
     return cardHoverTransform(item, context)
+  }
+}
+
+/**
+ * Solo: the line of Contacts of Stradivarius, above his board, from left to right, within the width of the board
+ * [S14]. A card of the hand of the player can be dropped on any of its cards to swap them (DrawRule).
+ */
+export class StradivariusContactsLocator extends ListLocator<PlayerColor, MaterialType, LocationType> {
+  parentItemType = MaterialType.PlayerBoard
+  getParentItem = playerBoard
+  coordinates = { x: handX, y: contactsY }
+  gap = { x: cardPitch }
+  maxGap = { x: boardWidth - cardWidth }
+
+  getHoverTransform(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
+    return cardHoverTransform(item, context)
+  }
+}
+
+/** Solo: the activity track of the board of Stradivarius, its 4 circles (% of the board, measured on the image). */
+const activityX = [24.8, 37.3, 50, 62.8]
+
+export class ActivityTrackLocator extends Locator<PlayerColor, MaterialType, LocationType> {
+  parentItemType = MaterialType.PlayerBoard
+  getParentItem = playerBoard
+
+  getPositionOnParent(location: Loc) {
+    return { x: activityX[((location.x as number) ?? 1) - 1], y: 15.3 }
   }
 }
 

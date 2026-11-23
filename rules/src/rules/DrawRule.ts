@@ -1,6 +1,7 @@
 import { isMoveItemType, ItemMove } from '@gamepark/rules-api'
 import { LocationType } from '../material/LocationType'
 import { MaterialType } from '../material/MaterialType'
+import { stradivarius } from '../logic/Solo'
 import { PlayerColor } from '../PlayerColor'
 import { Move, TaskRule } from './TaskRule'
 
@@ -33,6 +34,13 @@ export class DrawRule extends TaskRule {
         moves.push(...table.hand(player).moveItems({ type: LocationType.Contacts, player: opponent, id: pile, x: 0 }))
       }
     }
+    // Solo [S14]: every card of the line of Contacts of Stradivarius can be swapped; the card given takes its place.
+    const bot = stradivarius(this.game)
+    if (bot !== undefined) {
+      for (const contact of table.cards.location(LocationType.StradivariusContacts).player(bot).getItems()) {
+        moves.push(...table.hand(player).moveItems({ type: LocationType.StradivariusContacts, player: bot, x: contact.location.x }))
+      }
+    }
     return moves
   }
 
@@ -42,6 +50,11 @@ export class DrawRule extends TaskRule {
       // The former top card comes into the hand: that move ends the draw.
       const previousTop = this.table.contactPile(move.location.player!, move.location.id as number).location((location) => location.x === 1)
       return [previousTop.moveItem({ type: LocationType.PlayerHand, player: this.player })]
+    }
+    if (move.location.type === LocationType.StradivariusContacts) {
+      // The card given took the place of the card swapped, now on its right.
+      const swapped = this.table.cards.location(LocationType.StradivariusContacts).player(move.location.player).location((location) => location.x === move.location.x! + 1)
+      return [swapped.moveItem({ type: LocationType.PlayerHand, player: this.player })]
     }
     return this.next()
   }

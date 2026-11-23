@@ -29,6 +29,8 @@ import {
   Note,
   PlayerBoardEn,
   PlayerBoardFr,
+  soloBoardsEn,
+  soloBoardsFr,
   startingImagesEn,
   startingImagesFr,
   violinImages
@@ -43,11 +45,14 @@ import {
   getDisplayedPlayer,
   masterHeight,
   masterWidth,
+  playerBoardItem,
   stacksPanelClass,
   stacksPanelLeftSlot,
   stacksPanelSlot,
+  tablePlayers,
   tokenImageSize
 } from '../locators/TableLayout'
+import { stradivarius } from '@gamepark/paneveggio/logic/Solo'
 
 /**
  * The English images are the default ones, shown in every language but French (decision of 09/11/2026 on BGA):
@@ -127,10 +132,17 @@ class CharacterCardDescription extends CardDescription<PlayerColor, MaterialType
   }
 }
 
-/** Is the card clicked the top card of the pile of Contacts where the move puts a card? */
+/**
+ * Is the card clicked the top card of the pile of Contacts where the move puts a card, or in solo the card of the line of
+ * Stradivarius whose place the move takes?
+ */
 const isOnTopOfPile = (move: MaterialMove, context: ItemContext<PlayerColor, MaterialType, LocationType>) => {
-  if (!isMoveItemType(MaterialType.CharacterCard)(move) || move.location.type !== LocationType.Contacts) return false
+  if (!isMoveItemType(MaterialType.CharacterCard)(move)) return false
   const { location } = context.rules.material(MaterialType.CharacterCard).getItem(context.index)
+  if (move.location.type === LocationType.StradivariusContacts) {
+    return location.type === LocationType.StradivariusContacts && location.player === move.location.player && location.x === move.location.x
+  }
+  if (move.location.type !== LocationType.Contacts) return false
   return location.type === LocationType.Contacts && location.player === move.location.player && location.id === move.location.id && location.x === 0
 }
 
@@ -170,9 +182,11 @@ class PlayerBoardDescription extends BoardDescription<PlayerColor, MaterialType,
   width = boardWidth
   height = boardHeight
   image = PlayerBoardEn
+  /** Solo: the board of Stradivarius is the one of his level, its id. */
+  images = soloBoardsEn
 
   getStaticItems(context: MaterialContext<PlayerColor, MaterialType, LocationType>) {
-    return context.rules.players.map((player) => ({ location: { type: LocationType.PlayerBoard, player } }))
+    return tablePlayers(context.rules).map((player) => playerBoardItem(context.rules, player))
   }
 
   isMenuAlwaysVisible() {
@@ -186,9 +200,21 @@ class PlayerBoardDescription extends BoardDescription<PlayerColor, MaterialType,
     return boardHoverTransform(item, context)
   }
 
-  /** The 4 piles of Contacts above the board: drop areas for a discard or a swapped card (ContactsLocator). */
-  getLocations(item: MaterialItem<PlayerColor, LocationType>) {
-    return [1, 2, 3, 4].map((id) => ({ type: LocationType.Contacts, player: item.location.player, id }))
+  /**
+   * The 4 piles of Contacts above the board: drop areas for a discard or a swapped card (ContactsLocator). Solo: each card
+   * of the line of Contacts of Stradivarius, where a card of the hand is swapped [S14].
+   */
+  getLocations(item: MaterialItem<PlayerColor, LocationType>, context: ItemContext<PlayerColor, MaterialType, LocationType>) {
+    const player = item.location.player
+    if (player === stradivarius(context.rules.game)) {
+      return context.rules
+        .material(MaterialType.CharacterCard)
+        .location(LocationType.StradivariusContacts)
+        .player(player)
+        .getItems()
+        .map((card) => ({ type: LocationType.StradivariusContacts, player, x: card.location.x }))
+    }
+    return [1, 2, 3, 4].map((id) => ({ type: LocationType.Contacts, player, id }))
   }
 
   /**
@@ -215,6 +241,7 @@ class PlayerBoardDescription extends BoardDescription<PlayerColor, MaterialType,
 
 class FrenchPlayerBoardDescription extends PlayerBoardDescription {
   image = PlayerBoardFr
+  images = soloBoardsFr
 }
 
 /** The Master Luthier board: its illustration without text, at its true proportions (decision of 19/11/2026). */

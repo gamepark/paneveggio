@@ -2,6 +2,15 @@ import { Action } from '@gamepark/paneveggio/material/Action'
 import { PlayerColor } from '@gamepark/paneveggio/PlayerColor'
 import PlayerBoardEn from './boards/player-en.webp'
 import PlayerBoardFr from './boards/player-fr.webp'
+import ForteEn from './boards/solo/forte-en.webp'
+import ForteFr from './boards/solo/forte-fr.webp'
+import FortissimoEn from './boards/solo/fortissimo-en.webp'
+import FortissimoFr from './boards/solo/fortissimo-fr.webp'
+import PianissimoEn from './boards/solo/pianissimo-en.webp'
+import PianissimoFr from './boards/solo/pianissimo-fr.webp'
+import PianoEn from './boards/solo/piano-en.webp'
+import PianoFr from './boards/solo/piano-fr.webp'
+import { SoloLevel } from '@gamepark/paneveggio/PaneveggioOptions'
 import MasterBoard from './boards/master.webp'
 import CardBack from './cards/back.webp'
 import FirstPlayerCard from './cards/first-player.webp'
@@ -20,6 +29,20 @@ import ViolinOrange from './tokens/violin-orange.webp'
 import ViolinRed from './tokens/violin-red.webp'
 
 export { CardBack, Ducat, FirstPlayerCard, MasterBoard, Note, PlayerBoardEn, PlayerBoardFr, Star, Study, Wood }
+
+/** Solo: the board of Stradivarius of each level, the back of a player board (RULES p. 21). */
+export const soloBoardsEn: Record<SoloLevel, string> = {
+  [SoloLevel.Pianissimo]: PianissimoEn,
+  [SoloLevel.Piano]: PianoEn,
+  [SoloLevel.Forte]: ForteEn,
+  [SoloLevel.Fortissimo]: FortissimoEn
+}
+export const soloBoardsFr: Record<SoloLevel, string> = {
+  [SoloLevel.Pianissimo]: PianissimoFr,
+  [SoloLevel.Piano]: PianoFr,
+  [SoloLevel.Forte]: ForteFr,
+  [SoloLevel.Fortissimo]: FortissimoFr
+}
 
 /** Card number -> image, from the file name (`<nn>.webp`). */
 const byNumber = (files: Record<string, string>): Record<number, string> =>

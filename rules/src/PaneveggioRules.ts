@@ -3,13 +3,16 @@ import {
   hideItemId,
   hideItemIdToOthers,
   isMoveItemType,
+  isStartPlayerTurn,
+  isStartRule,
   MaterialGame,
   MaterialMove,
   PositiveSequenceStrategy,
   SecretMaterialRules,
   TimeLimit
 } from '@gamepark/rules-api'
-import { computeScore } from './logic/Scoring'
+import { computeScore, soloWon } from './logic/Scoring'
+import { isSolo } from './logic/Solo'
 import { Table } from './logic/Table'
 import { LocationType } from './material/LocationType'
 import { MaterialType } from './material/MaterialType'
@@ -44,7 +47,25 @@ import { SheetMusicRule } from './rules/SheetMusicRule'
 import { SomisRule } from './rules/SomisRule'
 import { SpreadDiscardsRule } from './rules/SpreadDiscardsRule'
 import { SpreadReturnedTokensRule } from './rules/SpreadReturnedTokensRule'
+import {
+  SetupStradivariusRule,
+  StradivariusActivityRule,
+  StradivariusConservationRule,
+  StradivariusEndOfTurnRule,
+  StradivariusTurnRule,
+  StradivariusWorkshopRule
+} from './rules/StradivariusRules'
 import { ValorizeRule } from './rules/ValorizeRule'
+
+/** Solo: the steps of Stradivarius, played by the server (they draw from the hidden draw pile). */
+const stradivariusRules = [
+  RuleId.SetupStradivarius,
+  RuleId.StradivariusTurn,
+  RuleId.StradivariusConservation,
+  RuleId.StradivariusActivity,
+  RuleId.StradivariusWorkshop,
+  RuleId.StradivariusEndOfTurn
+]
 
 type Game = MaterialGame<PlayerColor, MaterialType, LocationType, RuleId>
 type Move = MaterialMove<PlayerColor, MaterialType, LocationType, RuleId>
@@ -93,7 +114,13 @@ export class PaneveggioRules
     [RuleId.Conservation]: ConservationRule,
     [RuleId.EndTurn]: EndTurnRule,
     [RuleId.FinalSheetMusic]: FinalSheetMusicRule,
-    [RuleId.FinalApprentices]: FinalApprenticesRule
+    [RuleId.FinalApprentices]: FinalApprenticesRule,
+    [RuleId.SetupStradivarius]: SetupStradivariusRule,
+    [RuleId.StradivariusTurn]: StradivariusTurnRule,
+    [RuleId.StradivariusConservation]: StradivariusConservationRule,
+    [RuleId.StradivariusActivity]: StradivariusActivityRule,
+    [RuleId.StradivariusWorkshop]: StradivariusWorkshopRule,
+    [RuleId.StradivariusEndOfTurn]: StradivariusEndOfTurnRule
   }
 
   locationsStrategies = {
@@ -105,7 +132,8 @@ export class PaneveggioRules
       [LocationType.TurnDiscard]: new PositiveSequenceStrategy(),
       [LocationType.PartnerMusicians]: new PositiveSequenceStrategy(),
       [LocationType.PartnerApprentices]: new PositiveSequenceStrategy(),
-      [LocationType.StartingMusicians]: new PositiveSequenceStrategy()
+      [LocationType.StartingMusicians]: new PositiveSequenceStrategy(),
+      [LocationType.StradivariusContacts]: new PositiveSequenceStrategy()
     },
     [MaterialType.StartingCard]: {
       [LocationType.StartingCards]: new PositiveSequenceStrategy()
@@ -131,9 +159,11 @@ export class PaneveggioRules
 
   /**
    * Moves whose consequences the client cannot compute: the starting decks are taken from the draw pile, and the
-   * Master Luthier board of the Mulligan and Draft setups is drawn from it.
+   * Master Luthier board of the Mulligan and Draft setups is drawn from it. In solo, the turn of Stradivarius looks for
+   * cards in the draw pile.
    */
   isUnpredictableMove(move: Move, player: PlayerColor): boolean {
+    if ((isStartRule(move) || isStartPlayerTurn(move)) && stradivariusRules.includes(move.id)) return true
     if (isMoveItemType(MaterialType.StartingCard)(move)) return true
     if (isMoveItemType(MaterialType.CharacterCard)(move) && move.location.type === LocationType.PartnerMusicians && this.game.rule?.id === RuleId.ChooseStartingMusician) {
       return true
@@ -149,8 +179,13 @@ export class PaneveggioRules
     return false
   }
 
+  /**
+   * In solo, the player scores their points only if they beat Stradivarius (as in Djeser): "gagné" or "perdu" [S13, S17].
+   */
   getScore(player: PlayerColor): number {
-    return computeScore(this, player).total
+    const score = computeScore(this, player).total
+    if (isSolo(this.game) && !soloWon(this)) return 0
+    return score
   }
 
   /**
