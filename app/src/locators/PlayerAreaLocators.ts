@@ -193,12 +193,17 @@ export class ReturnedTokensLocator extends PileLocator<PlayerColor, MaterialType
   radius = { x: 2, y: 0.3 }
 }
 
-/** The tokens not used yet, on the left of the hand: the Violin tokens above, the Lutherie tokens under them. */
+/**
+ * The tokens not used yet, on the left of the hand: the Violin tokens above, the Lutherie tokens under them, each in a
+ * tidy pile with the number left written on its top token (Ludo, 23/11/2026; see reserveNumber in Material).
+ */
 export class ReserveLocator extends PileLocator<PlayerColor, MaterialType, LocationType> {
   parentItemType = MaterialType.PlayerBoard
   getParentItem = playerBoard
   coordinates = { x: leftColumnX, y: handY }
-  radius = { x: 2, y: 1.3 }
+  radius = 0.15
+  /** Not turned: the number written on the top token stays straight. */
+  maxAngle = 0
 
   getPileId(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
     return `${super.getPileId(item, context)}-${context.type}`
@@ -206,9 +211,12 @@ export class ReserveLocator extends PileLocator<PlayerColor, MaterialType, Locat
 
   getItemCoordinates(item: MaterialItem<PlayerColor, LocationType>, context: ItemCtx) {
     const { x = 0, y = 0, z = 0 } = super.getItemCoordinates(item, context)
-    return { x, y: y + (context.type === MaterialType.ViolinToken ? -2 : 2), z }
+    return { x, y: y + (context.type === MaterialType.ViolinToken ? -1 : 1) * reserveGap, z }
   }
 }
+
+/** Half the distance between the pile of Violin tokens and the pile of Lutherie tokens of the reserve, close together (Ludo, 23/11/2026). */
+const reserveGap = 1.1
 
 // ------------------------------------------------------------------ on the board (% of the board, measured on BGA)
 

@@ -346,6 +346,7 @@ class ViolinTokenDescription extends WoodenTokenDescription {
    * tokens are small discs under it (OnViolinLocator), as on BGA. A selected wood shines.
    */
   getItemExtraCss(item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) {
+    if (item.location.type === LocationType.Reserve) return [reserveNumber(item, context), item.selected && selectedGlow]
     const quality = woodQuality(context, context.index)
     const number =
       (item.location.type === LocationType.WoodStock && quality === 1) || item.location.type === LocationType.MusicianSlot ? tokenNumber(quality) : undefined
@@ -382,6 +383,7 @@ class LutherieTokenDescription extends WoodenTokenDescription {
       const pile = (type === LocationType.HelpArea ? tokens.location(type).id(item.id) : tokens.location(type).player(player)).getIndexes()
       return context.index === Math.max(...pile) ? tokenNumber(pile.length) : undefined
     }
+    if (type === LocationType.Reserve) return reserveNumber(item, context)
     if (type === LocationType.OnViolin) {
       const quality = woodQuality(context, parent!)
       const number = isInStock(context, parent!) && x === quality - 2 ? tokenNumber(quality) : undefined
@@ -389,6 +391,15 @@ class LutherieTokenDescription extends WoodenTokenDescription {
     }
     return undefined
   }
+}
+
+/**
+ * The reserve of a player: one tidy pile of Violin tokens and one of Lutherie tokens, the number of tokens left written
+ * on the top token of each (Ludo, 23/11/2026).
+ */
+const reserveNumber = (item: MaterialItem<PlayerColor, LocationType>, context: TokenContext) => {
+  const pile = context.rules.material(context.type).location(LocationType.Reserve).player(item.location.player).getIndexes()
+  return context.index === Math.max(...pile) ? tokenNumber(pile.length) : undefined
 }
 
 /**

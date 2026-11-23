@@ -9,13 +9,14 @@ import { computeScore, currentScore } from '@gamepark/paneveggio/logic/Scoring'
 import { Table } from '@gamepark/paneveggio/logic/Table'
 import { MaterialMoveBuilder, MaterialRules } from '@gamepark/rules-api'
 import { createPortal } from 'react-dom'
-import { CardBack, Ducat, Star, Study, violinImages, Wood } from '../images/Images'
+import { CardBack, Ducat, lutherieImages, Star, Study, violinImages, Wood } from '../images/Images'
 import { getDisplayedPlayer } from '../locators/TableLayout'
 
 /**
  * A click on a panel displays that player area large (decision of 19/11/2026). The panel of the area displayed large
  * is outlined; the others show an eye.
- * Counters (decision D6, as on BGA): the score, then violins crafted /12, ducats, studies, woods in stock, cards in hand.
+ * Counters (decision D6, as on BGA): the score, then violins crafted /12, ducats, studies, woods in stock, cards in hand,
+ * and the Lutherie tokens left in reserve (Ludo, 23/11/2026).
  * The score is the Prestige of the violins minus the help during the game, the final scoring once it is over.
  */
 export const PlayerPanels = () => {
@@ -44,7 +45,8 @@ export const PlayerPanels = () => {
               { image: Ducat, value: table.ducats(player.id).length },
               { image: Study, value: table.studies(player.id).length },
               { image: Wood, value: table.woods(player.id).length },
-              { image: CardBack, value: table.hand(player.id).length }
+              { image: CardBack, value: table.hand(player.id).length },
+              { image: lutherieImages[player.id], value: table.reserve(player.id).length }
             ]}
             countersPerLine={3}
             onClick={() => play(MaterialMoveBuilder.changeView(player.id), { transient: true })}
