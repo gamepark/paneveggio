@@ -23,6 +23,15 @@ const theme = {
         font-size: 3.4em;
         margin-top: 0.45em;
       }
+      /*
+       * A button that cannot be clicked now (the tutorial keeps them all but one until its popup is closed) stays readable
+       * on the dark bar: the default grey at half opacity disappears there (Ludo, 23/11/2026).
+       */
+      h1 button:disabled {
+        color: rgba(255, 255, 255, 0.55);
+        border-color: rgba(255, 255, 255, 0.55);
+        opacity: 1;
+      }
     `
   }
 }
