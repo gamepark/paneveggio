@@ -23,11 +23,17 @@ const popup = (key: string, position?: { x?: number; y?: number }) => ({
 /** The popup at the top of the screen, above what is focused. */
 const top = { y: -25 }
 
-/** Every focus leaves room at the top of the screen for its popup, unless it says otherwise (as in Greylune). */
+/**
+ * Every focus keeps a wide view, unless it says otherwise: room at the top of the screen for its popup, and on the right
+ * for the player panels, which stand over the table; and a zoom moderate enough to see what is around (Ludo, 23/11/2026:
+ * "le tutoriel est trop grossi et je ne vois pas tout et la carte musicien partenaire est cachée par les encadrés").
+ */
+const focusMargin = { top: 10, bottom: 6, left: 10, right: 26 }
+
 const roomForPopup = (steps: Step[]): Step[] =>
   steps.map((step) => {
     const focus = step.focus
-    return focus ? { ...step, focus: (game, context) => ({ margin: { top: 7, bottom: 0.5, left: 0.5, right: 0.5 }, ...focus(game, context) }) } : step
+    return focus ? { ...step, focus: (game, context) => ({ margin: focusMargin, ...focus(game, context) }) } : step
   })
 
 const isCustom = (type: CustomMoveType, data?: unknown) => (move: Move) =>
@@ -132,7 +138,7 @@ export class Tutorial extends MaterialTutorial<PlayerColor, MaterialType, Locati
     { popup: popup('theme') },
     {
       popup: popup('board', top),
-      focus: (game) => ({ staticItems: this.board(me), materials: [this.area(game)], margin: { top: 7, bottom: 0.5, left: 0.5, right: 0.5 } })
+      focus: (game) => ({ staticItems: this.board(me), materials: [this.area(game)], margin: { top: 7, bottom: 0.5, left: 0.5, right: 22 } })
     },
     {
       popup: popup('sheet-music', top),
